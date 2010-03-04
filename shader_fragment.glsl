@@ -38,7 +38,7 @@ bool getIntersection(in vec3 orig, in vec3 dir,
 		inout float dist, inout vec3 hitpoint, inout vec3 normal)
 {
 	/* Simple sphere intersection for now. */
-	vec3 sphere_origin = vec3(0, 0, 2);
+	vec3 sphere_origin = vec3(0, 0, 0);
 	float sphere_radius2 = 1.0;
 
 	hitpoint = vec3(0, 0, 0);

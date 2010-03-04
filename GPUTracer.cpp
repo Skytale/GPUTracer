@@ -72,16 +72,13 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-
-	glLoadIdentity();
-
-	// FIXME: FIX THIS! Copying that array should not be needed.
+	/* Copy the orientation matrix to a float array. That's needed so we
+	 * can pass it to the shaders. */
 	float oriMatrix[16];
 	for (int i = 0; i < 16; i++)
 		oriMatrix[i] = win.orientationMatrixPtr()[i];
 
+	/* Same for position of the camera. */
 	float fpos[3];
 	fpos[0] = win.pos().x();
 	fpos[1] = win.pos().y();
@@ -90,17 +87,14 @@ void display(void)
 	glUniformMatrix4fv(handle_rot, 1, true, oriMatrix);
 	glUniform3fv(handle_pos, 1, fpos);
 
-	/* Draw one black quad so that we get one fragment covering the
-	 * whole screen. */
-	glColor3f(0, 0, 0);
+	/* Draw one quad so that we get one fragment covering the whole
+	 * screen. */
 	glBegin(GL_QUADS);
 	glVertex3f(-1, -1,  0);
 	glVertex3f( 1, -1,  0);
 	glVertex3f( 1,  1,  0);
 	glVertex3f(-1,  1,  0);
 	glEnd();
-
-	glPopMatrix();
 
 	glutSwapBuffers();
 }
@@ -112,7 +106,7 @@ void reshape(int w, int h)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-1, 1, -1, 1, -10, 10);
+	glOrtho(-1, 1, -1, 1, -1, 1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -123,53 +117,57 @@ void keyboard(unsigned char key, int x, int y)
 	switch (key)
 	{
 		case 'w':
-			std::cout << "DOWN" << std::endl;
+			//std::cout << "DOWN" << std::endl;
 			win.rotateAroundAxis(0, rotationDegree);
 			break;
 		case 's':
-			std::cout << "UP" << std::endl;
+			//std::cout << "UP" << std::endl;
 			win.rotateAroundAxis(0, -rotationDegree);
 			break;
 
 		case 'a':
-			std::cout << "LEFT" << std::endl;
+			//std::cout << "LEFT" << std::endl;
 			win.rotateAroundAxis(1, rotationDegree);
 			break;
 		case 'd':
-			std::cout << "RIGHT" << std::endl;
+			//std::cout << "RIGHT" << std::endl;
 			win.rotateAroundAxis(1, -rotationDegree);
 			break;
 
 		case 'q':
-			std::cout << "LEFT ROLL" << std::endl;
+			//std::cout << "LEFT ROLL" << std::endl;
 			win.rotateAroundAxis(2, -rotationDegree);
 			break;
 		case 'e':
-			std::cout << "RIGHT ROLL" << std::endl;
+			//std::cout << "RIGHT ROLL" << std::endl;
 			win.rotateAroundAxis(2, rotationDegree);
 			break;
 
 		case 'j':
-			std::cout << "Moving forward." << std::endl;
+			//std::cout << "Moving forward." << std::endl;
 			win.moveAlongAxis(2, movingStep);
 			break;
 		case 'k':
-			std::cout << "Moving backward." << std::endl;
+			//std::cout << "Moving backward." << std::endl;
 			win.moveAlongAxis(2, -movingStep);
 			break;
 
 		case 'h':
-			std::cout << "Moving left." << std::endl;
+			//std::cout << "Moving left." << std::endl;
 			win.moveAlongAxis(0, -movingStep);
 			break;
 		case 'l':
-			std::cout << "Moving right." << std::endl;
+			//std::cout << "Moving right." << std::endl;
 			win.moveAlongAxis(0, movingStep);
 			break;
 
 		case 'r':
 			std::cout << "Reset." << std::endl;
 			win.reset();
+			break;
+
+		case ' ':
+			win.dumpInfos();
 			break;
 	}
 
@@ -188,6 +186,10 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(keyboard);
 
 	loadShaders();
+
+	/* We don't start at (0, 0, 0). Most objects are centered at that
+	 * position so we push the cam a little bit. */
+	win.setInitialPosition(Vec3(0, 0, -5));
 	win.reset();
 
 	glutMainLoop();

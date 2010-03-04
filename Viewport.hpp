@@ -28,6 +28,7 @@ class Viewport
 {
 	private:
 		Vec3 _pos;
+		Vec3 _initPos;
 
 #ifdef MATRIX_ROTATION
 		Mat4 _ori;
@@ -100,10 +101,6 @@ class Viewport
 			ori() *= mult;
 			ori().normalize();
 #endif
-
-			// Print the current orientation
-			std::cout << "Orientation:" << std::endl;
-			ori().dump();
 		}
 
 		void moveAlongAxis(int whichAxis, double step)
@@ -118,9 +115,6 @@ class Viewport
 			axis.normalize();
 			axis *= step;
 			pos() += axis;
-
-			std::cout << "Position:" << std::endl;
-			pos().dump();
 		}
 
 		double *orientationMatrixPtr()
@@ -141,15 +135,34 @@ class Viewport
 #endif
 		}
 
+		void setInitialPosition(Vec3 p)
+		{
+			_initPos = p;
+		}
+
 		void reset()
 		{
 			ori().makeIdentity();
-			pos() = Vec3(0, 0, 0);
+			pos() = _initPos;
+		}
 
-			std::cout << "Orientation:" << std::endl;
-			ori().dump();
-			std::cout << "Position:" << std::endl;
-			pos().dump();
+		void dumpInfos()
+		{
+			std::cout << "Camera:" << std::endl;
+			std::cout << "\torigin "
+				<< pos().x() << " "
+				<< pos().y() << " "
+				<< pos().z() << " " << std::endl;
+
+			std::cout << "\tviewdir "
+				<< orientationMatrixPtr()[2] << " "
+				<< orientationMatrixPtr()[6] << " "
+				<< orientationMatrixPtr()[10] << std::endl;
+
+			std::cout << "\tupdir "
+				<< orientationMatrixPtr()[1] << " "
+				<< orientationMatrixPtr()[5] << " "
+				<< orientationMatrixPtr()[9] << std::endl;
 		}
 };
 
