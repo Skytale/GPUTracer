@@ -22,9 +22,9 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "Utils.h"
+#include "Utils.hpp"
 
-char *readFile(char *path)
+char *readFile(const char *path)
 {
 	struct stat statbuf;
 	char *databuf = NULL;

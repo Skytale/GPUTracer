@@ -18,11 +18,11 @@
 */
 
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef UTILS_HPP
+#define UTILS_HPP
 
 
-char *readFile(char *path);
+char *readFile(const char *path);
 
 
-#endif /* UTILS_H */
+#endif /* UTILS_HPP */
