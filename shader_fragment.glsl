@@ -18,9 +18,12 @@
 */
 
 
-varying vec3 eye, pos_on_plane;
-varying vec3 light1;
+varying vec3 p;
 
+uniform mat4 rot;
+uniform vec3 pos;
+
+vec3 light1 = vec3(0, 0, 0);
 vec3 light1_diffuse = vec3(1.0, 1.0, 1.0);
 vec3 light1_specular = vec3(1.0, 1.0, 1.0);
 
@@ -35,7 +38,7 @@ bool getIntersection(in vec3 orig, in vec3 dir,
 		inout float dist, inout vec3 hitpoint, inout vec3 normal)
 {
 	/* Simple sphere intersection for now. */
-	vec3 sphere_origin = vec3(0, 0, -2);
+	vec3 sphere_origin = vec3(0, 0, 2);
 	float sphere_radius2 = 1.0;
 
 	hitpoint = vec3(0, 0, 0);
@@ -65,7 +68,8 @@ bool getIntersection(in vec3 orig, in vec3 dir,
 	return true;
 }
 
-void lighting(in vec3 hitpoint, in vec3 normal, inout vec3 color)
+void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
+	inout vec3 color)
 {
 	vec3 eye_dir = normalize(eye - hitpoint);
 	vec3 light_dir;
@@ -95,7 +99,21 @@ void lighting(in vec3 hitpoint, in vec3 normal, inout vec3 color)
 void main(void)
 {
 	/* Ray from eye to interpolated position on viewing plane. */
-	vec3 ray = normalize(pos_on_plane - eye);
+	vec3 eye = vec3(0.0, 0.0, 0.0);
+	vec3 poi = p + vec3(0.0, 0.0, 1.0);
+	light1 = eye + vec3(0.0, 2.0, 0.0);
+
+	/* Rotate them all according to rotation matrix of main program. */
+	eye = vec3(rot * vec4(eye, 1.0));
+	poi = vec3(rot * vec4(poi, 1.0));
+	light1 = vec3(rot * vec4(light1, 1.0));
+
+	/* Move them to desired position of the eye. */
+	eye += pos;
+	poi += pos;
+	light1 += pos;
+
+	vec3 ray = normalize(poi - eye);
 
 	/* Does this ray hit the surface of the object? */
 	float alpha = 0;
@@ -110,6 +128,6 @@ void main(void)
 
 	/* There's an intersection with the object, so do lighting. */
 	vec3 col = vec3(0, 0, 0);
-	lighting(hitpoint, normal, col);
+	lighting(eye, hitpoint, normal, col);
 	gl_FragColor = vec4(col, 1);
 }

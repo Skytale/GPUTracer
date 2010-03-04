@@ -23,20 +23,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 #include "Utils.hpp"
+#include "Viewport.hpp"
 
-
-struct _set
-{
-	int res;
-} set;
-
-
-void loadDefaultSettings(void)
-{
-	set.res = 512;
-}
+Viewport win;
+static const double rotationDegree = 2;
+static const double movingStep = 0.02;
+static GLint handle_rot;
+static GLint handle_pos;
 
 void loadShaders(void)
 {
@@ -66,12 +62,33 @@ void loadShaders(void)
 
 	glLinkProgram(shader);
 
+	handle_rot = glGetUniformLocation(shader, "rot");
+	handle_pos = glGetUniformLocation(shader, "pos");
+
 	glUseProgram(shader);
 }
 
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	glLoadIdentity();
+
+	// FIXME: FIX THIS! Copying that array should not be needed.
+	float oriMatrix[16];
+	for (int i = 0; i < 16; i++)
+		oriMatrix[i] = win.orientationMatrixPtr()[i];
+
+	float fpos[3];
+	fpos[0] = win.pos().x();
+	fpos[1] = win.pos().y();
+	fpos[2] = win.pos().z();
+
+	glUniformMatrix4fv(handle_rot, 1, true, oriMatrix);
+	glUniform3fv(handle_pos, 1, fpos);
 
 	/* Draw one black quad so that we get one fragment covering the
 	 * whole screen. */
@@ -83,6 +100,8 @@ void display(void)
 	glVertex3f(-1,  1,  0);
 	glEnd();
 
+	glPopMatrix();
+
 	glutSwapBuffers();
 }
 
@@ -93,25 +112,83 @@ void reshape(int w, int h)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-1, 1, -1, 1, -1, 1);
+	glOrtho(-1, 1, -1, 1, -10, 10);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
 
+void keyboard(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+		case 'w':
+			std::cout << "DOWN" << std::endl;
+			win.rotateAroundAxis(0, rotationDegree);
+			break;
+		case 's':
+			std::cout << "UP" << std::endl;
+			win.rotateAroundAxis(0, -rotationDegree);
+			break;
+
+		case 'a':
+			std::cout << "LEFT" << std::endl;
+			win.rotateAroundAxis(1, rotationDegree);
+			break;
+		case 'd':
+			std::cout << "RIGHT" << std::endl;
+			win.rotateAroundAxis(1, -rotationDegree);
+			break;
+
+		case 'q':
+			std::cout << "LEFT ROLL" << std::endl;
+			win.rotateAroundAxis(2, -rotationDegree);
+			break;
+		case 'e':
+			std::cout << "RIGHT ROLL" << std::endl;
+			win.rotateAroundAxis(2, rotationDegree);
+			break;
+
+		case 'j':
+			std::cout << "Moving forward." << std::endl;
+			win.moveAlongAxis(2, movingStep);
+			break;
+		case 'k':
+			std::cout << "Moving backward." << std::endl;
+			win.moveAlongAxis(2, -movingStep);
+			break;
+
+		case 'h':
+			std::cout << "Moving left." << std::endl;
+			win.moveAlongAxis(0, -movingStep);
+			break;
+		case 'l':
+			std::cout << "Moving right." << std::endl;
+			win.moveAlongAxis(0, movingStep);
+			break;
+
+		case 'r':
+			std::cout << "Reset." << std::endl;
+			win.reset();
+			break;
+	}
+
+	glutPostRedisplay();
+}
+
 int main(int argc, char **argv)
 {
-	loadDefaultSettings();
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(set.res, set.res);
+	glutInitWindowSize(512, 512);
 	glutCreateWindow("GPU-Tracer");
 
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
+	glutKeyboardFunc(keyboard);
 
 	loadShaders();
+	win.reset();
 
 	glutMainLoop();
 	exit(EXIT_SUCCESS);
