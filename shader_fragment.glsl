@@ -172,12 +172,11 @@ void main(void)
 	// Ray from eye to interpolated position on viewing plane.
 	vec3 eye = vec3(0.0, 0.0, 0.0);
 	vec3 poi = p + vec3(0.0, 0.0, -1.0);
-	light0 = eye + vec3(0.0, 0.5, 0.0);
 
 	// Rotate them all according to rotation matrix of main program.
 	eye = vec3(rot * vec4(eye, 1.0));
 	poi = vec3(rot * vec4(poi, 1.0));
-	light0 = vec3(rot * vec4(eye + light0, 1.0));
+	light0 = vec3(rot * vec4(light0, 1.0));
 
 	// Move them to desired position of the eye.
 	eye += pos;
