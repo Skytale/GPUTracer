@@ -41,6 +41,9 @@ static bool mouseInverted = true;
 static double mouseSpeed = 0.1;
 static bool mouseDown = false;
 
+static bool light0_enabled = true;
+static bool light1_enabled = true;
+
 static float raymarching_stepsize_hi = 0.01;
 static float raymarching_stepsize_lo = 0.2;
 static float raymarching_stepsize = raymarching_stepsize_lo;
@@ -100,14 +103,28 @@ void display(void)
 	float light1_diffuse[]  = { 0.3,  0.3,  1.0,  1.0};
 	float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,  light0_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
-	glEnable(GL_LIGHT1);
-	glLightfv(GL_LIGHT1, GL_POSITION, light1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE,  light1_diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+	if (light0_enabled)
+	{
+		// Abuse GL_SPOT_CUTOFF as a switch to toggle the light.
+		glEnable(GL_LIGHT0);
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 1.0f);
+		glLightfv(GL_LIGHT0, GL_POSITION, light0);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE,  light0_diffuse);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+	}
+	else
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 0.0f);
+
+	if (light1_enabled)
+	{
+		glEnable(GL_LIGHT1);
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 1.0f);
+		glLightfv(GL_LIGHT1, GL_POSITION, light1);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE,  light1_diffuse);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+	}
+	else
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 0.0f);
 
 	// Copy the orientation matrix to a float array. That's needed so we
 	// can pass it to the shaders.
@@ -242,6 +259,14 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'G':
 			raymarching_accuracy = raymarching_accuracy_hi;
+			break;
+
+		case '1':
+			light0_enabled = !light0_enabled;
+			break;
+
+		case '2':
+			light1_enabled = !light1_enabled;
 			break;
 
 		case 'm':

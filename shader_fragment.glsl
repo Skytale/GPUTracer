@@ -149,22 +149,28 @@ void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 	float specular;
 
 	// Phong shading for: Headlight.
-	light_dir = normalize(light0 - hitpoint);
-	diffuse = max(dot(light_dir, normal), 0.0);
-	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
-	temp = (light0_diffuse * diffuse);
-	temp.xyz *= object_diffuse.xyz;
-	color += temp;
-	color += (light0_specular * pow(specular, object_shininess));
+	if (gl_LightSource[0].spotCutoff == 1.0)
+	{
+		light_dir = normalize(light0 - hitpoint);
+		diffuse = max(dot(light_dir, normal), 0.0);
+		specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
+		temp = (light0_diffuse * diffuse);
+		temp.xyz *= object_diffuse.xyz;
+		color += temp;
+		color += (light0_specular * pow(specular, object_shininess));
+	}
 
 	// Phong shading for: Static light.
-	light_dir = normalize(light1 - hitpoint);
-	diffuse = max(dot(light_dir, normal), 0.0);
-	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
-	temp = (light1_diffuse * diffuse);
-	temp.xyz *= object_diffuse.xyz;
-	color += temp;
-	color += (light1_specular * pow(specular, object_shininess));
+	if (gl_LightSource[1].spotCutoff == 1.0)
+	{
+		light_dir = normalize(light1 - hitpoint);
+		diffuse = max(dot(light_dir, normal), 0.0);
+		specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
+		temp = (light1_diffuse * diffuse);
+		temp.xyz *= object_diffuse.xyz;
+		color += temp;
+		color += (light1_specular * pow(specular, object_shininess));
+	}
 }
 
 void main(void)
