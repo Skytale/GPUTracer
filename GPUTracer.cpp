@@ -65,10 +65,9 @@ static float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
 void loadShaders(void)
 {
 	const char *vs_source = readFile("shader_vertex.glsl");
-	const char *fs_source = readFile("shader_fragment.glsl");
+	const char *fs_source = readFile("shader_fragment_final.glsl");
 	shader = 0;
-	GLuint vs_handle = 0;
-	GLuint fs_handle = 0;
+	GLuint shader_handle = 0;
 
 	if (vs_source == NULL || fs_source == NULL)
 	{
@@ -78,15 +77,15 @@ void loadShaders(void)
 
 	shader = glCreateProgram();
 
-	vs_handle = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs_handle, 1, &vs_source, NULL);
-	glCompileShader(vs_handle);
-	glAttachShader(shader, vs_handle);
+	shader_handle = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(shader_handle, 1, &vs_source, NULL);
+	glCompileShader(shader_handle);
+	glAttachShader(shader, shader_handle);
 
-	fs_handle = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs_handle, 1, &fs_source, NULL);
-	glCompileShader(fs_handle);
-	glAttachShader(shader, fs_handle);
+	shader_handle = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(shader_handle, 1, &fs_source, NULL);
+	glCompileShader(shader_handle);
+	glAttachShader(shader, shader_handle);
 
 	glLinkProgram(shader);
 

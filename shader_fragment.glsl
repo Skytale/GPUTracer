@@ -40,104 +40,15 @@ uniform float accuracy;
 float maxval = 10;
 float normalEps = 1e-5;
 
-float evalAt(vec3 at)
-{
-	// Trig-free order 8 Mandelbulb.
-
-	float eps = 1e-7;
-	vec3 z = at;
-	vec3 c = at;
-	float r = 0.0;
-	for (float count = 0; count < 4; count += 1)
-	{
-		vec3 z2 = z * z;
-		r = sqrt(dot(z, z));
-
-		if (r > 2.0)
-			break;
-
-		float planeXY = sqrt(z2.x + z2.y) + eps;
-		r += eps;
-
-		float sinPhi = z.y / planeXY;
-		float cosPhi = z.x / planeXY;
-		float sinThe = planeXY / r;
-		float cosThe = z.z / r;
-
-		for (float cascade = 0; cascade < 3; cascade += 1)
-		{
-			float sinPhi2 = 2.0 * sinPhi * cosPhi;
-			float cosPhi2 = 2.0 * cosPhi * cosPhi - 1.0;
-			float sinThe2 = 2.0 * sinThe * cosThe;
-			float cosThe2 = 2.0 * cosThe * cosThe - 1.0;
-
-			sinPhi = sinPhi2;
-			cosPhi = cosPhi2;
-			sinThe = sinThe2;
-			cosThe = cosThe2;
-		}
-
-		float rPow = 1;
-		for (float i = 0; i < 8; i += 1)
-			rPow *= r;
-
-		z.x = rPow * sinThe * cosPhi  +  c.x;
-		z.y = rPow * sinThe * sinPhi  +  c.y;
-		z.z = rPow * cosThe           +  c.z;
-	}
-
-	return 1.0 / r - 0.5;
-}
-
-bool getIntersection(in vec3 orig, in vec3 dir,
-		inout float dist, inout vec3 hitpoint, inout vec3 normal)
-{
-	// Raymarching with fixed initial step size and final bisection.
-	vec3 at = orig + dist * dir;
-	float val = evalAt(at);
-	bool sit = (val > 0.0);
-	bool sitStart = sit;
-	float cstep = stepsize;
-
-	for (dist = 0; dist < maxval; dist += cstep)
-	{
-		at = orig + dist * dir;
-		val = evalAt(at);
-		sit = (val > 0.0);
-
-		// Situation changed, start bisection.
-		if (sit != sitStart)
-		{
-			float a1 = dist - stepsize;
-			float a2 = dist;
-
-			while (cstep > accuracy)
-			{
-				cstep *= 0.5;
-				dist = a1 + cstep;
-
-				at = orig + dist * dir;
-				val = evalAt(at);
-				sit = (val > 0.0);
-
-				if (sit == sitStart)
-					a1 = dist;
-			}
-
-			hitpoint = at;
-
-			// "Finite difference thing". :)
-			float gx = evalAt(vec3(at.x + normalEps, at.yz));
-			float gy = evalAt(vec3(at.x, at.y + normalEps, at.z));
-			float gz = evalAt(vec3(at.xy, at.z + normalEps));
-			normal = normalize(vec3(val - gx, val - gy, val - gz));
-
-			return true;
-		}
-	}
-
-	return false;
-}
+// This will be processed by CPP. You have to call something like this:
+//
+//     $ cpp -DOBJECT_FUNCTIONS='"myObject.glsl"' \
+//         -DRAY_FUNCTIONS='"myRayMarching.glsl"' \
+//         shader_fragment.glsl shader_fragment_final.glsl
+//
+// This will include your object code at this point.
+#include OBJECT_FUNCTIONS
+#include RAY_FUNCTIONS
 
 void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 	inout vec3 color)
@@ -195,7 +106,7 @@ void main(void)
 	float alpha = 0;
 	vec3 hitpoint;
 	vec3 normal;
-	if (!getIntersection(eye, ray, alpha, hitpoint, normal))
+	if (!findIntersection(eye, ray, alpha, hitpoint, normal))
 	{
 		// Draw a dark grey on ray misses. Makes debugging easier.
 		gl_FragColor = vec4(0.05, 0.05, 0.05, 1);
