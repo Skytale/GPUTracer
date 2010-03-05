@@ -36,6 +36,7 @@ float object_shininess = 10;
 
 // Parameters for ray marching
 uniform float stepsize;
+uniform float accuracy;
 float maxval = 10;
 float normalEps = 1e-5;
 
@@ -91,13 +92,38 @@ float evalAt(vec3 at)
 bool getIntersection(in vec3 orig, in vec3 dir,
 		inout float dist, inout vec3 hitpoint, inout vec3 normal)
 {
-	// Raymarching with fixed step size.
-	for (dist = 0; dist < maxval; dist += stepsize)
+	// Raymarching with fixed initial step size and final bisection.
+	vec3 at = orig + dist * dir;
+	float val = evalAt(at);
+	bool sit = (val > 0.0);
+	bool sitStart = sit;
+	float cstep = stepsize;
+
+	for (dist = 0; dist < maxval; dist += cstep)
 	{
-		vec3 at = orig + dist * dir;
-		float val = evalAt(at);
-		if (val > 0.0)
+		at = orig + dist * dir;
+		val = evalAt(at);
+		sit = (val > 0.0);
+
+		// Situation changed, start bisection.
+		if (sit != sitStart)
 		{
+			float a1 = dist - stepsize;
+			float a2 = dist;
+
+			while (cstep > accuracy)
+			{
+				cstep *= 0.5;
+				dist = a1 + cstep;
+
+				at = orig + dist * dir;
+				val = evalAt(at);
+				sit = (val > 0.0);
+
+				if (sit == sitStart)
+					a1 = dist;
+			}
+
 			hitpoint = at;
 
 			// "Finite difference thing". :)

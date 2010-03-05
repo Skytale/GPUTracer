@@ -34,6 +34,7 @@ static GLuint shader;
 static GLint handle_rot;
 static GLint handle_pos;
 static GLint handle_stepsize;
+static GLint handle_accuracy;
 
 static bool mouseLook = false;
 static bool mouseInverted = true;
@@ -43,6 +44,10 @@ static bool mouseDown = false;
 static float raymarching_stepsize_hi = 0.01;
 static float raymarching_stepsize_lo = 0.2;
 static float raymarching_stepsize = raymarching_stepsize_lo;
+
+static float raymarching_accuracy_hi = 1e-5;
+static float raymarching_accuracy_lo = 1e-2;
+static float raymarching_accuracy = raymarching_accuracy_lo;
 
 void loadShaders(void)
 {
@@ -75,6 +80,7 @@ void loadShaders(void)
 	handle_rot = glGetUniformLocation(shader, "rot");
 	handle_pos = glGetUniformLocation(shader, "pos");
 	handle_stepsize = glGetUniformLocation(shader, "stepsize");
+	handle_accuracy = glGetUniformLocation(shader, "accuracy");
 }
 
 void display(void)
@@ -119,6 +125,7 @@ void display(void)
 	glUniformMatrix4fv(handle_rot, 1, true, oriMatrix);
 	glUniform3fv(handle_pos, 1, fpos);
 	glUniform1f(handle_stepsize, raymarching_stepsize);
+	glUniform1f(handle_accuracy, raymarching_accuracy);
 
 	// Draw one quad so that we get one fragment covering the whole
 	// screen.
@@ -227,6 +234,14 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'T':
 			raymarching_stepsize = raymarching_stepsize_hi;
+			break;
+
+		case 'g':
+			raymarching_accuracy = raymarching_accuracy_lo;
+			break;
+
+		case 'G':
+			raymarching_accuracy = raymarching_accuracy_hi;
 			break;
 
 		case 'm':
