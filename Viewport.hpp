@@ -182,21 +182,29 @@ class Viewport
 
 		void dumpInfos()
 		{
+			std::cout << std::endl;
 			std::cout << "Camera:" << std::endl;
-			std::cout << "\torigin "
+			std::cout << "-------" << std::endl;
+			std::cout << "origin "
 				<< pos().x() << " "
 				<< pos().y() << " "
 				<< pos().z() << " " << std::endl;
 
-			std::cout << "\tviewdir "
-				<< orientationMatrixPtr()[2] << " "
-				<< orientationMatrixPtr()[6] << " "
-				<< orientationMatrixPtr()[10] << std::endl;
+			// Actually, this is: T * (0, 0, -1).
+			// Same reason as above, we want to get the negative z-axis
+			// in local coordinates.
+			std::cout << "viewdir "
+				<< -orientationMatrixPtr()[2] << " "
+				<< -orientationMatrixPtr()[6] << " "
+				<< -orientationMatrixPtr()[10] << std::endl;
 
-			std::cout << "\tupdir "
+			// That's T * (0, 1, 0).
+			std::cout << "updir "
 				<< orientationMatrixPtr()[1] << " "
 				<< orientationMatrixPtr()[5] << " "
 				<< orientationMatrixPtr()[9] << std::endl;
+
+			std::cout << std::endl;
 		}
 };
 

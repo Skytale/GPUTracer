@@ -30,6 +30,7 @@
 
 Viewport win;
 static const double rotationDegree = 2;
+static GLuint shader;
 static GLint handle_rot;
 static GLint handle_pos;
 
@@ -42,7 +43,7 @@ void loadShaders(void)
 {
 	const char *vs_source = readFile("shader_vertex.glsl");
 	const char *fs_source = readFile("shader_fragment.glsl");
-	GLuint shader = 0;
+	shader = 0;
 	GLuint vs_handle = 0;
 	GLuint fs_handle = 0;
 
@@ -68,13 +69,13 @@ void loadShaders(void)
 
 	handle_rot = glGetUniformLocation(shader, "rot");
 	handle_pos = glGetUniformLocation(shader, "pos");
-
-	glUseProgram(shader);
 }
 
 void display(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(shader);
 
 	// Copy the orientation matrix to a float array. That's needed so we
 	// can pass it to the shaders.
@@ -99,6 +100,33 @@ void display(void)
 	glVertex3f( 1,  1,  0);
 	glVertex3f(-1,  1,  0);
 	glEnd();
+
+	// Draw coordinate system.
+	glUseProgram(0);
+	glEnable(GL_DEPTH_TEST);
+	glPushMatrix();
+
+	glLineWidth(3.0);
+	glTranslated(0.75, -0.75, 0);
+	glScaled(0.2, 0.2, 0.2);
+	glMultMatrixf(oriMatrix);
+	glBegin(GL_LINES);
+
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(1, 0, 0);
+
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 1, 0);
+
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 0, 1);
+
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_DEPTH_TEST);
 
 	glutSwapBuffers();
 }
@@ -131,11 +159,11 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'w':
 			//std::cout << "Moving forward." << std::endl;
-			win.moveAlongAxis(2, 1, mouseDown);
+			win.moveAlongAxis(2, -1, mouseDown);
 			break;
 		case 's':
 			//std::cout << "Moving backward." << std::endl;
-			win.moveAlongAxis(2, -1, mouseDown);
+			win.moveAlongAxis(2, 1, mouseDown);
 			break;
 
 		case 'a':
@@ -218,8 +246,8 @@ void motion(int x, int y)
 	// Okay, rotate.
 	// mouseSpeed is a factor that's commonly known as
 	// "mouse sensitivity".
-	win.rotateAroundAxis(0, (mouseInverted ? 1 : -1) * mouseSpeed * dy);
-	win.rotateAroundAxis(1, -mouseSpeed * dx);
+	win.rotateAroundAxis(0, (mouseInverted ? -1 : 1) * mouseSpeed * dy);
+	win.rotateAroundAxis(1, mouseSpeed * dx);
 
 	// Now warp the pointer back to the center.
 	glutWarpPointer(win.w() * 0.5, win.h() * 0.5);
@@ -260,7 +288,7 @@ int main(int argc, char **argv)
 	win.setSize(512, 512);
 
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(win.w(), win.h());
 	glutCreateWindow("GPU-Tracer");
 
@@ -276,7 +304,7 @@ int main(int argc, char **argv)
 	// We don't start at (0, 0, 0). Most objects are centered at that
 	// position so we push the cam a little bit. This also sets the
 	// initial moving step.
-	win.setInitialConfig(Vec3(0, 0, -5), 0.02);
+	win.setInitialConfig(Vec3(0, 0, 5), 0.02);
 	win.reset();
 
 	glutMainLoop();

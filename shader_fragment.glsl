@@ -100,7 +100,7 @@ void main(void)
 {
 	// Ray from eye to interpolated position on viewing plane.
 	vec3 eye = vec3(0.0, 0.0, 0.0);
-	vec3 poi = p + vec3(0.0, 0.0, 1.0);
+	vec3 poi = p + vec3(0.0, 0.0, -1.0);
 	light1 = eye + vec3(0.0, 0.5, 0.0);
 
 	// Rotate them all according to rotation matrix of main program.
@@ -121,8 +121,8 @@ void main(void)
 	vec3 normal;
 	if (!getIntersection(eye, ray, alpha, hitpoint, normal))
 	{
-		// Draw a dark blue on ray misses. Makes debugging easier.
-		gl_FragColor = vec4(0, 0, 0.2, 1);
+		// Draw a dark grey on ray misses. Makes debugging easier.
+		gl_FragColor = vec4(0.05, 0.05, 0.05, 1);
 		return;
 	}
 
