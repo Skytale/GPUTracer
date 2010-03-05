@@ -37,6 +37,7 @@ static GLint handle_pos;
 static bool mouseLook = false;
 static bool mouseInverted = true;
 static double mouseSpeed = 0.1;
+static bool mouseDown = false;
 
 void loadShaders(void)
 {
@@ -118,6 +119,12 @@ void reshape(int w, int h)
 
 void keyboard(unsigned char key, int x, int y)
 {
+	double mStep = movingStep;
+
+	// Move faster if a mouse button is pressed.
+	if (mouseDown)
+		mStep *= 10;
+
 	switch (key)
 	{
 		case 'q':
@@ -131,23 +138,32 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'w':
 			//std::cout << "Moving forward." << std::endl;
-			win.moveAlongAxis(2, movingStep);
+			win.moveAlongAxis(2, mStep);
 			break;
 		case 's':
 			//std::cout << "Moving backward." << std::endl;
-			win.moveAlongAxis(2, -movingStep);
+			win.moveAlongAxis(2, -mStep);
 			break;
 
 		case 'a':
 			//std::cout << "Moving left." << std::endl;
-			win.moveAlongAxis(0, -movingStep);
+			win.moveAlongAxis(0, -mStep);
 			break;
 		case 'd':
 			//std::cout << "Moving right." << std::endl;
-			win.moveAlongAxis(0, movingStep);
+			win.moveAlongAxis(0, mStep);
 			break;
 
 		case 'r':
+			//std::cout << "Moving up." << std::endl;
+			win.moveAlongAxis(1, mStep);
+			break;
+		case 'f':
+			//std::cout << "Moving down." << std::endl;
+			win.moveAlongAxis(1, -mStep);
+			break;
+
+		case 'R':
 			std::cout << "Reset." << std::endl;
 			win.reset();
 			break;
@@ -219,6 +235,18 @@ void motion(int x, int y)
 	glutPostRedisplay();
 }
 
+void mouse(int button, int state, int x, int y)
+{
+	if (state == GLUT_DOWN)
+	{
+		mouseDown = true;
+	}
+	else
+	{
+		mouseDown = false;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	win.setSize(512, 512);
@@ -231,6 +259,7 @@ int main(int argc, char **argv)
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
+	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 	glutPassiveMotionFunc(motion);
 
