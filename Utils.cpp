@@ -30,14 +30,14 @@ char *readFile(const char *path)
 	char *databuf = NULL;
 	FILE *fp = NULL;
 
-	/* Determine file size. */
+	// Determine file size.
 	if (stat(path, &statbuf) == -1)
 	{
 		perror("Could not stat file");
 		return NULL;
 	}
 
-	/* Allocate memory for the content. */
+	// Allocate memory for the content.
 	databuf = (char *)malloc(statbuf.st_size + 1);
 	if (databuf == NULL)
 	{
@@ -52,9 +52,9 @@ char *readFile(const char *path)
 		return NULL;
 	}
 
-	/* Read 1 element of size "statbuf.st_size". fread() returns the
-	 * number of items successfully read. Thus, a return value of "1"
-	 * means "success" and anything else is an error. */
+	// Read 1 element of size "statbuf.st_size". fread() returns the
+	// number of items successfully read. Thus, a return value of "1"
+	// means "success" and anything else is an error.
 	if (fread(databuf, statbuf.st_size, 1, fp) != 1)
 	{
 		fprintf(stderr, "Unexpected end of file.\n");
@@ -64,7 +64,7 @@ char *readFile(const char *path)
 
 	fclose(fp);
 
-	/* Add NULL terminator. */
+	// Add NULL terminator.
 	databuf[statbuf.st_size] = 0;
 
 	return databuf;

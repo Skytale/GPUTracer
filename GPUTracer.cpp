@@ -72,13 +72,13 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	/* Copy the orientation matrix to a float array. That's needed so we
-	 * can pass it to the shaders. */
+	// Copy the orientation matrix to a float array. That's needed so we
+	// can pass it to the shaders.
 	float oriMatrix[16];
 	for (int i = 0; i < 16; i++)
 		oriMatrix[i] = win.orientationMatrixPtr()[i];
 
-	/* Same for position of the camera. */
+	// Same for position of the camera.
 	float fpos[3];
 	fpos[0] = win.pos().x();
 	fpos[1] = win.pos().y();
@@ -87,8 +87,8 @@ void display(void)
 	glUniformMatrix4fv(handle_rot, 1, true, oriMatrix);
 	glUniform3fv(handle_pos, 1, fpos);
 
-	/* Draw one quad so that we get one fragment covering the whole
-	 * screen. */
+	// Draw one quad so that we get one fragment covering the whole
+	// screen.
 	glBegin(GL_QUADS);
 	glVertex3f(-1, -1,  0);
 	glVertex3f( 1, -1,  0);
@@ -187,8 +187,8 @@ int main(int argc, char **argv)
 
 	loadShaders();
 
-	/* We don't start at (0, 0, 0). Most objects are centered at that
-	 * position so we push the cam a little bit. */
+	// We don't start at (0, 0, 0). Most objects are centered at that
+	// position so we push the cam a little bit.
 	win.setInitialPosition(Vec3(0, 0, -5));
 	win.reset();
 

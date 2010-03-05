@@ -22,12 +22,12 @@ varying vec3 p;
 
 void main(void)
 {
-	/* Keep the original positions of the vertices of the quad. */
+	// Keep the original positions of the vertices of the quad.
 	gl_Position = gl_Vertex;
 
-	/* Save the positions of all four vertices of the quad. However,
-	 * This is a vertex shader and "p" is a varying variable. That
-	 * means, this position will get interpolated over the quad. So we
-	 * get a point on the viewing plane -- for each pixel. */
+	// Save the positions of all four vertices of the quad. However,
+	// This is a vertex shader and "p" is a varying variable. That
+	// means, this position will get interpolated over the quad. So we
+	// get a point on the viewing plane -- for each pixel.
 	p = gl_Vertex;
 }

@@ -37,7 +37,7 @@ float object_shininess = 10;
 bool getIntersection(in vec3 orig, in vec3 dir,
 		inout float dist, inout vec3 hitpoint, inout vec3 normal)
 {
-	/* Simple sphere intersection for now. */
+	// Simple sphere intersection for now.
 	vec3 sphere_origin = vec3(0, 0, 0);
 	float sphere_radius2 = 1.0;
 
@@ -59,11 +59,11 @@ bool getIntersection(in vec3 orig, in vec3 dir,
 	else
 		return false;
 
-	/* We finally got our hitpoint and the normal at this point. */
+	// We finally got our hitpoint and the normal at this point.
 	hitpoint = orig + dist * dir;
 	normal   = normalize(hitpoint - sphere_origin);
 
-	/* Push hitpoint by an epsilon to avoid artifacts. */
+	// Push hitpoint by an epsilon to avoid artifacts.
 	hitpoint += 1e-5 * normal;
 	return true;
 }
@@ -77,7 +77,7 @@ void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 	float diffuse;
 	float specular;
 
-	/* Phong shading for: Headlight. */
+	// Phong shading for: Headlight.
 	light_dir = normalize(light1 - hitpoint);
 	diffuse = max(dot(light_dir, normal), 0.0);
 	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
@@ -86,7 +86,7 @@ void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 	color += temp;
 	color += (light1_specular * pow(specular, object_shininess));
 
-	/* Phong shading for: Static light. */
+	// Phong shading for: Static light.
 	light_dir = normalize(light2 - hitpoint);
 	diffuse = max(dot(light_dir, normal), 0.0);
 	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
@@ -98,35 +98,35 @@ void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 
 void main(void)
 {
-	/* Ray from eye to interpolated position on viewing plane. */
+	// Ray from eye to interpolated position on viewing plane.
 	vec3 eye = vec3(0.0, 0.0, 0.0);
 	vec3 poi = p + vec3(0.0, 0.0, 1.0);
 	light1 = eye + vec3(0.0, 2.0, 0.0);
 
-	/* Rotate them all according to rotation matrix of main program. */
+	// Rotate them all according to rotation matrix of main program.
 	eye = vec3(rot * vec4(eye, 1.0));
 	poi = vec3(rot * vec4(poi, 1.0));
 	light1 = vec3(rot * vec4(light1, 1.0));
 
-	/* Move them to desired position of the eye. */
+	// Move them to desired position of the eye.
 	eye += pos;
 	poi += pos;
 	light1 += pos;
 
 	vec3 ray = normalize(poi - eye);
 
-	/* Does this ray hit the surface of the object? */
+	// Does this ray hit the surface of the object?
 	float alpha = 0;
 	vec3 hitpoint;
 	vec3 normal;
 	if (!getIntersection(eye, ray, alpha, hitpoint, normal))
 	{
-		/* Draw a dark blue on ray misses. Makes debugging easier. */
+		// Draw a dark blue on ray misses. Makes debugging easier.
 		gl_FragColor = vec4(0, 0, 0.2, 1);
 		return;
 	}
 
-	/* There's an intersection with the object, so do lighting. */
+	// There's an intersection with the object, so do lighting.
 	vec3 col = vec3(0, 0, 0);
 	lighting(eye, hitpoint, normal, col);
 	gl_FragColor = vec4(col, 1);
