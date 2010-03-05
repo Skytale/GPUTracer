@@ -120,24 +120,6 @@ void keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-		case 'w':
-			//std::cout << "DOWN" << std::endl;
-			win.rotateAroundAxis(0, rotationDegree);
-			break;
-		case 's':
-			//std::cout << "UP" << std::endl;
-			win.rotateAroundAxis(0, -rotationDegree);
-			break;
-
-		case 'a':
-			//std::cout << "LEFT" << std::endl;
-			win.rotateAroundAxis(1, rotationDegree);
-			break;
-		case 'd':
-			//std::cout << "RIGHT" << std::endl;
-			win.rotateAroundAxis(1, -rotationDegree);
-			break;
-
 		case 'q':
 			//std::cout << "LEFT ROLL" << std::endl;
 			win.rotateAroundAxis(2, -rotationDegree);
@@ -147,20 +129,20 @@ void keyboard(unsigned char key, int x, int y)
 			win.rotateAroundAxis(2, rotationDegree);
 			break;
 
-		case 'j':
+		case 'w':
 			//std::cout << "Moving forward." << std::endl;
 			win.moveAlongAxis(2, movingStep);
 			break;
-		case 'k':
+		case 's':
 			//std::cout << "Moving backward." << std::endl;
 			win.moveAlongAxis(2, -movingStep);
 			break;
 
-		case 'h':
+		case 'a':
 			//std::cout << "Moving left." << std::endl;
 			win.moveAlongAxis(0, -movingStep);
 			break;
-		case 'l':
+		case 'd':
 			//std::cout << "Moving right." << std::endl;
 			win.moveAlongAxis(0, movingStep);
 			break;
@@ -198,6 +180,10 @@ void keyboard(unsigned char key, int x, int y)
 				std::cout << "Mouse inverted." << std::endl;
 			else
 				std::cout << "Mouse not inverted." << std::endl;
+			break;
+
+		case 27:
+			exit(EXIT_SUCCESS);
 			break;
 	}
 
