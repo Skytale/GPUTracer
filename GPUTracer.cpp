@@ -33,6 +33,7 @@ static const double rotationDegree = 2;
 static GLuint shader;
 static GLint handle_rot;
 static GLint handle_pos;
+static GLint handle_eyedist;
 static GLint handle_stepsize;
 static GLint handle_accuracy;
 
@@ -91,6 +92,7 @@ void loadShaders(void)
 
 	handle_rot = glGetUniformLocation(shader, "rot");
 	handle_pos = glGetUniformLocation(shader, "pos");
+	handle_eyedist = glGetUniformLocation(shader, "eyedist");
 	handle_stepsize = glGetUniformLocation(shader, "stepsize");
 	handle_accuracy = glGetUniformLocation(shader, "accuracy");
 }
@@ -141,6 +143,7 @@ void display(void)
 
 	glUniformMatrix4fv(handle_rot, 1, true, oriMatrix);
 	glUniform3fv(handle_pos, 1, fpos);
+	glUniform1f(handle_eyedist, win.eyedist());
 	glUniform1f(handle_stepsize, raymarching_stepsize);
 	glUniform1f(handle_accuracy, raymarching_accuracy);
 
@@ -345,6 +348,22 @@ void keyboard(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void keyboardSpecial(int key, int x, int y)
+{
+	switch (key)
+	{
+		case GLUT_KEY_DOWN:
+			win.setFOV(win.fov() * 1.05);
+			break;
+
+		case GLUT_KEY_UP:
+			win.setFOV(win.fov() / 1.05);
+			break;
+	}
+
+	glutPostRedisplay();
+}
+
 void motion(int x, int y)
 {
 	if (!mouseLook)
@@ -414,6 +433,7 @@ int main(int argc, char **argv)
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(keyboardSpecial);
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 	glutPassiveMotionFunc(motion);
@@ -423,7 +443,7 @@ int main(int argc, char **argv)
 	// We don't start at (0, 0, 0). Most objects are centered at that
 	// position so we push the cam a little bit. This also sets the
 	// initial moving step.
-	win.setInitialConfig(Vec3(0, 0, 2.5), 0.02);
+	win.setInitialConfig(Vec3(0, 0, 2.5), 0.02, 60.0);
 	win.reset();
 
 	glutMainLoop();

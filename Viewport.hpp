@@ -29,6 +29,7 @@ class Viewport
 	private:
 		int _w;
 		int _h;
+		double _fov;
 		Vec3 _pos;
 		Vec3 _initPos;
 		double _movingStep;
@@ -44,6 +45,7 @@ class Viewport
 		Vec3& pos() { return _pos; }
 		int w() { return _w; }
 		int h() { return _h; }
+		double fov() { return _fov; }
 
 #ifdef MATRIX_ROTATION
 		Mat4& ori() { return _ori; }
@@ -133,10 +135,11 @@ class Viewport
 #endif
 		}
 
-		void setInitialConfig(Vec3 p, double step)
+		void setInitialConfig(Vec3 p, double step, double initialfov)
 		{
 			_initPos = p;
 			_initMovingStep = step;
+			_fov = initialfov;
 		}
 
 		void setSize(int w, int h)
@@ -171,12 +174,26 @@ class Viewport
 			std::cout << "Resetting everything." << std::endl;
 		}
 
+		void setFOV(double f)
+		{
+			_fov = f;
+		}
+
+		float eyedist()
+		{
+			// Convert to radiant
+			double radiant = fov() * (M_PI / 180);
+
+			radiant *= 0.5;
+			return 1.0 / tan(radiant);
+		}
+
 		void dumpInfos()
 		{
 			Mat4 T = orientationMatrix();
 
 			std::cout << "camera" << std::endl;
-			std::cout << "\tfov 90" << std::endl;
+			std::cout << "\tfov " << fov() << std::endl;
 			std::cout << "\torigin "
 				<< pos().x() << " "
 				<< pos().y() << " "

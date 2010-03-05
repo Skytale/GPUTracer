@@ -22,6 +22,7 @@ varying vec3 p;
 
 uniform mat4 rot;
 uniform vec3 pos;
+uniform float eyedist;
 
 vec3 light0 = gl_LightSource[0].position.xyz;
 vec3 light0_diffuse = gl_LightSource[0].diffuse.xyz;
@@ -82,7 +83,7 @@ void main(void)
 {
 	// Ray from eye to interpolated position on viewing plane.
 	vec3 eye = vec3(0.0, 0.0, 0.0);
-	vec3 poi = p + vec3(0.0, 0.0, -1.0);
+	vec3 poi = p + vec3(0.0, 0.0, -eyedist);
 
 	// Rotate them all according to rotation matrix of main program.
 	eye = vec3(rot * vec4(eye, 1.0));
