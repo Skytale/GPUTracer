@@ -19,7 +19,8 @@ These objects are already implemented:
 
 * Traditional raytracing with algebraic intersection testing: A simple
   sphere.
-* Ray marching with final bisection: Mandelbulb and a smooth cube.
+* Ray marching with final bisection: Mandelbulb, Quaternion Julia
+  Fractals and a smooth cube.
 
 
 Building
