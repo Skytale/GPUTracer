@@ -52,6 +52,16 @@ static float raymarching_accuracy_hi = 1e-5;
 static float raymarching_accuracy_lo = 1e-2;
 static float raymarching_accuracy = raymarching_accuracy_lo;
 
+// Light0 specifies the headlight. Its "position" is added to the
+// current position of the eye.
+// Light1 is a static light somewhere in the scene.
+static float light0[]          = { 0.0,  0.5,  0.0,  0.0};
+static float light0_diffuse[]  = { 1.0,  1.0,  1.0,  1.0};
+static float light0_specular[] = { 1.0,  1.0,  1.0,  1.0};
+static float light1[]          = {10.0,  0.0,  0.0,  0.0};
+static float light1_diffuse[]  = { 0.3,  0.3,  1.0,  1.0};
+static float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
+
 void loadShaders(void)
 {
 	const char *vs_source = readFile("shader_vertex.glsl");
@@ -93,15 +103,6 @@ void display(void)
 	glUseProgram(shader);
 
 	// Enable light sources.
-	// Light0 specifies the headlight. Its "position" is added to the
-	// current position of the eye.
-	// Light1 is a static light somewhere in the scene.
-	float light0[]          = { 0.0,  0.5,  0.0,  0.0};
-	float light0_diffuse[]  = { 1.0,  1.0,  1.0,  1.0};
-	float light0_specular[] = { 1.0,  1.0,  1.0,  1.0};
-	float light1[]          = {10.0,  0.0,  0.0,  0.0};
-	float light1_diffuse[]  = { 0.3,  0.3,  1.0,  1.0};
-	float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
 	glEnable(GL_LIGHTING);
 	if (light0_enabled)
 	{
@@ -199,6 +200,8 @@ void reshape(int w, int h)
 
 void keyboard(unsigned char key, int x, int y)
 {
+	Mat4 T;
+
 	switch (key)
 	{
 		case 'q':
@@ -242,7 +245,32 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 
 		case ' ':
+			std::cout << std::endl;
 			win.dumpInfos();
+			T = win.orientationMatrix();
+			std::cout << "# Headlight:" << std::endl;
+			std::cout << "pointlight" << std::endl;
+			std::cout << "\torigin "
+				<< ( T[0]*light0[0] + T[1]*light0[1] + T[2]*light0[2]
+						+ T[3] + win.pos().x()) << " "
+				<< (T[4]*light0[0] + T[5]*light0[1] + T[6]*light0[2]
+						+ T[7] + win.pos().y()) << " "
+				<< (T[8]*light0[0] + T[9]*light0[1] + T[10]*light0[2]
+						+ T[11] + win.pos().z()) << " "
+				<< std::endl;
+			std::cout << "\tintensity 0.1" << std::endl;
+			std::cout << "end" << std::endl;
+			std::cout << std::endl;
+
+			std::cout << "# Static light:" << std::endl;
+			std::cout << "pointlight" << std::endl;
+			std::cout << "\torigin "
+				<< light1[0] << " "
+				<< light1[1] << " "
+				<< light1[2] << std::endl;
+			std::cout << "\tintensity 0.1" << std::endl;
+			std::cout << "end" << std::endl;
+			std::cout << std::endl;
 			break;
 
 		case 't':

@@ -175,10 +175,9 @@ class Viewport
 		{
 			Mat4 T = orientationMatrix();
 
-			std::cout << std::endl;
-			std::cout << "Camera:" << std::endl;
-			std::cout << "-------" << std::endl;
-			std::cout << "origin "
+			std::cout << "camera" << std::endl;
+			std::cout << "\tfov 90" << std::endl;
+			std::cout << "\torigin "
 				<< pos().x() << " "
 				<< pos().y() << " "
 				<< pos().z() << " " << std::endl;
@@ -186,17 +185,18 @@ class Viewport
 			// Actually, this is: T * (0, 0, -1).
 			// Same reason as above, we want to get the negative z-axis
 			// in local coordinates.
-			std::cout << "viewdir "
+			std::cout << "\tviewdir "
 				<< -T[2] << " "
 				<< -T[6] << " "
 				<< -T[10] << std::endl;
 
 			// That's T * (0, 1, 0).
-			std::cout << "updir "
+			std::cout << "\tupdir "
 				<< T[1] << " "
 				<< T[5] << " "
 				<< T[9] << std::endl;
 
+			std::cout << "end" << std::endl;
 			std::cout << std::endl;
 		}
 };
