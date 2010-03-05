@@ -49,7 +49,7 @@ static float raymarching_stepsize_hi = 0.01;
 static float raymarching_stepsize_lo = 0.2;
 static float raymarching_stepsize = raymarching_stepsize_lo;
 
-static float raymarching_accuracy_hi = 1e-5;
+static float raymarching_accuracy_hi = 1e-4;
 static float raymarching_accuracy_lo = 1e-2;
 static float raymarching_accuracy = raymarching_accuracy_lo;
 
