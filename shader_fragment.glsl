@@ -34,38 +34,39 @@ vec3 light1_specular = gl_LightSource[1].specular.xyz;
 vec3 object_diffuse = vec3(1.0, 0.7, 0.3);
 float object_shininess = 10;
 
+// Parameters for ray marching
+uniform float stepsize;
+float maxval = 10;
+float normalEps = 1e-5;
+
+float evalAt(vec3 at)
+{
+	return (1.0 / dot(at, at)) - 1.0;
+}
+
 bool getIntersection(in vec3 orig, in vec3 dir,
 		inout float dist, inout vec3 hitpoint, inout vec3 normal)
 {
-	// Simple sphere intersection for now.
-	vec3 sphere_origin = vec3(0, 0, 0);
-	float sphere_radius2 = 1.0;
+	// Raymarching with fixed step size.
+	for (dist = 0; dist < maxval; dist += stepsize)
+	{
+		vec3 at = orig + dist * dir;
+		float val = evalAt(at);
+		if (val > 0.0)
+		{
+			hitpoint = at;
 
-	hitpoint = vec3(0, 0, 0);
-	normal   = vec3(0, 0, 0);
+			// "Finite difference thing". :)
+			float gx = evalAt(vec3(at.x + normalEps, at.yz));
+			float gy = evalAt(vec3(at.x, at.y + normalEps, at.z));
+			float gz = evalAt(vec3(at.xy, at.z + normalEps));
+			normal = normalize(vec3(val - gx, val - gy, val - gz));
 
-	float alpha = -dot(dir, (orig - sphere_origin));
-	vec3 q = orig + alpha * dir - sphere_origin;
+			return true;
+		}
+	}
 
-	float distToCenter2 = dot(q, q);
-	if (distToCenter2 > sphere_radius2)
-		return false;
-
-	float a = sqrt(sphere_radius2 - distToCenter2);
-	if (alpha >= a)
-		dist = alpha - a;
-	else if (alpha + a > 0)
-		dist = alpha + a;
-	else
-		return false;
-
-	// We finally got our hitpoint and the normal at this point.
-	hitpoint = orig + dist * dir;
-	normal   = normalize(hitpoint - sphere_origin);
-
-	// Push hitpoint by an epsilon to avoid artifacts.
-	hitpoint += 1e-5 * normal;
-	return true;
+	return false;
 }
 
 void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,

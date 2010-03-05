@@ -33,11 +33,16 @@ static const double rotationDegree = 2;
 static GLuint shader;
 static GLint handle_rot;
 static GLint handle_pos;
+static GLint handle_stepsize;
 
 static bool mouseLook = false;
 static bool mouseInverted = true;
 static double mouseSpeed = 0.1;
 static bool mouseDown = false;
+
+static float raymarching_stepsize_hi = 0.02;
+static float raymarching_stepsize_lo = 0.2;
+static float raymarching_stepsize = raymarching_stepsize_lo;
 
 void loadShaders(void)
 {
@@ -69,6 +74,7 @@ void loadShaders(void)
 
 	handle_rot = glGetUniformLocation(shader, "rot");
 	handle_pos = glGetUniformLocation(shader, "pos");
+	handle_stepsize = glGetUniformLocation(shader, "stepsize");
 }
 
 void display(void)
@@ -112,6 +118,7 @@ void display(void)
 
 	glUniformMatrix4fv(handle_rot, 1, true, oriMatrix);
 	glUniform3fv(handle_pos, 1, fpos);
+	glUniform1f(handle_stepsize, raymarching_stepsize);
 
 	// Draw one quad so that we get one fragment covering the whole
 	// screen.
@@ -212,6 +219,14 @@ void keyboard(unsigned char key, int x, int y)
 
 		case ' ':
 			win.dumpInfos();
+			break;
+
+		case 't':
+			raymarching_stepsize = raymarching_stepsize_lo;
+			break;
+
+		case 'T':
+			raymarching_stepsize = raymarching_stepsize_hi;
 			break;
 
 		case 'm':
