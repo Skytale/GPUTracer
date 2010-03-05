@@ -40,7 +40,7 @@ static bool mouseInverted = true;
 static double mouseSpeed = 0.1;
 static bool mouseDown = false;
 
-static float raymarching_stepsize_hi = 0.02;
+static float raymarching_stepsize_hi = 0.01;
 static float raymarching_stepsize_lo = 0.2;
 static float raymarching_stepsize = raymarching_stepsize_lo;
 
