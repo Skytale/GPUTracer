@@ -408,7 +408,7 @@ int main(int argc, char **argv)
 	// We don't start at (0, 0, 0). Most objects are centered at that
 	// position so we push the cam a little bit. This also sets the
 	// initial moving step.
-	win.setInitialConfig(Vec3(0, 0, 5), 0.02);
+	win.setInitialConfig(Vec3(0, 0, 2.5), 0.02);
 	win.reset();
 
 	glutMainLoop();
