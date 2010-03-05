@@ -34,12 +34,6 @@ vec3 light1_specular = gl_LightSource[1].specular.xyz;
 vec3 object_diffuse = vec3(1.0, 0.7, 0.3);
 float object_shininess = 10;
 
-// Parameters for ray marching
-uniform float stepsize;
-uniform float accuracy;
-float maxval = 10;
-float normalEps = 1e-5;
-
 // This will be processed by CPP. You have to call something like this:
 //
 //     $ cpp -DOBJECT_FUNCTIONS='"myObject.glsl"' \
