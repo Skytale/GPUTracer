@@ -31,7 +31,7 @@ bool findIntersection(in vec3 orig, in vec3 dir,
 	// The object has to define evalAt().
 	vec3 at = orig + dist * dir;
 	float val = evalAt(at);
-	bool sit = (val > 0.0);
+	bool sit = (val < 0.0);
 	bool sitStart = sit;
 	float cstep = stepsize;
 
@@ -39,7 +39,7 @@ bool findIntersection(in vec3 orig, in vec3 dir,
 	{
 		at = orig + dist * dir;
 		val = evalAt(at);
-		sit = (val > 0.0);
+		sit = (val < 0.0);
 
 		// Situation changed, start bisection.
 		if (sit != sitStart)
@@ -54,7 +54,7 @@ bool findIntersection(in vec3 orig, in vec3 dir,
 
 				at = orig + dist * dir;
 				val = evalAt(at);
-				sit = (val > 0.0);
+				sit = (val < 0.0);
 
 				if (sit == sitStart)
 					a1 = dist;
@@ -66,7 +66,7 @@ bool findIntersection(in vec3 orig, in vec3 dir,
 			float gx = evalAt(vec3(at.x + normalEps, at.yz));
 			float gy = evalAt(vec3(at.x, at.y + normalEps, at.z));
 			float gz = evalAt(vec3(at.xy, at.z + normalEps));
-			normal = normalize(vec3(val - gx, val - gy, val - gz));
+			normal = normalize(vec3(gx - val, gy - val, gz - val));
 
 			return true;
 		}

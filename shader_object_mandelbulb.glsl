@@ -64,5 +64,5 @@ float evalAt(vec3 at)
 		z.z = rPow * cosThe           +  c.z;
 	}
 
-	return 1.0 / r - 0.5;
+	return r - 2.0;
 }

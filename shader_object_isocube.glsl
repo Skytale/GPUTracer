@@ -23,5 +23,5 @@ float evalAt(vec3 at)
 	// Simple iso surface cube. To be used with ray marching.
 
 	// This results in x^6 + y^6 + z^6.
-	return (1.0 / dot(at * at * at, at * at * at)) - 1.0;
+	return dot(at * at * at, at * at * at) - 1.0;
 }
