@@ -23,13 +23,13 @@ varying vec3 p;
 uniform mat4 rot;
 uniform vec3 pos;
 
-vec3 light1 = vec3(0, 0, 0);
-vec3 light1_diffuse = vec3(1.0, 1.0, 1.0);
-vec3 light1_specular = vec3(1.0, 1.0, 1.0);
+vec3 light0 = gl_LightSource[0].position.xyz;
+vec3 light0_diffuse = gl_LightSource[0].diffuse.xyz;
+vec3 light0_specular = gl_LightSource[0].specular.xyz;
 
-vec3 light2 = vec3(10.0, 0.0, 0);
-vec3 light2_diffuse = vec3(0.3, 0.3, 1.0);
-vec3 light2_specular = vec3(0.3, 0.3, 1.0);
+vec3 light1 = gl_LightSource[1].position.xyz;
+vec3 light1_diffuse = gl_LightSource[1].diffuse.xyz;
+vec3 light1_specular = gl_LightSource[1].specular.xyz;
 
 vec3 object_diffuse = vec3(1.0, 0.7, 0.3);
 float object_shininess = 10;
@@ -78,6 +78,15 @@ void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 	float specular;
 
 	// Phong shading for: Headlight.
+	light_dir = normalize(light0 - hitpoint);
+	diffuse = max(dot(light_dir, normal), 0.0);
+	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
+	temp = (light0_diffuse * diffuse);
+	temp.xyz *= object_diffuse.xyz;
+	color += temp;
+	color += (light0_specular * pow(specular, object_shininess));
+
+	// Phong shading for: Static light.
 	light_dir = normalize(light1 - hitpoint);
 	diffuse = max(dot(light_dir, normal), 0.0);
 	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
@@ -85,15 +94,6 @@ void lighting(in vec3 eye, in vec3 hitpoint, in vec3 normal,
 	temp.xyz *= object_diffuse.xyz;
 	color += temp;
 	color += (light1_specular * pow(specular, object_shininess));
-
-	// Phong shading for: Static light.
-	light_dir = normalize(light2 - hitpoint);
-	diffuse = max(dot(light_dir, normal), 0.0);
-	specular = max(dot(reflect(-light_dir, normal), eye_dir), 0.0);
-	temp = (light2_diffuse * diffuse);
-	temp.xyz *= object_diffuse.xyz;
-	color += temp;
-	color += (light2_specular * pow(specular, object_shininess));
 }
 
 void main(void)
@@ -101,17 +101,17 @@ void main(void)
 	// Ray from eye to interpolated position on viewing plane.
 	vec3 eye = vec3(0.0, 0.0, 0.0);
 	vec3 poi = p + vec3(0.0, 0.0, -1.0);
-	light1 = eye + vec3(0.0, 0.5, 0.0);
+	light0 = eye + vec3(0.0, 0.5, 0.0);
 
 	// Rotate them all according to rotation matrix of main program.
 	eye = vec3(rot * vec4(eye, 1.0));
 	poi = vec3(rot * vec4(poi, 1.0));
-	light1 = vec3(rot * vec4(light1, 1.0));
+	light0 = vec3(rot * vec4(eye + light0, 1.0));
 
 	// Move them to desired position of the eye.
 	eye += pos;
 	poi += pos;
-	light1 += pos;
+	light0 += pos;
 
 	vec3 ray = normalize(poi - eye);
 

@@ -77,6 +77,26 @@ void display(void)
 
 	glUseProgram(shader);
 
+	// Enable light sources.
+	// Light0 specifies the headlight. Its "position" is added to the
+	// current position of the eye.
+	// Light1 is a static light somewhere in the scene.
+	float light0[]          = { 0.0,  0.5,  0.0,  0.0};
+	float light0_diffuse[]  = { 1.0,  1.0,  1.0,  1.0};
+	float light0_specular[] = { 1.0,  1.0,  1.0,  1.0};
+	float light1[]          = {10.0,  0.0,  0.0,  0.0};
+	float light1_diffuse[]  = { 0.3,  0.3,  1.0,  1.0};
+	float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,  light0_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE,  light1_diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+
 	// Copy the orientation matrix to a float array. That's needed so we
 	// can pass it to the shaders.
 	float oriMatrix[16];
@@ -104,6 +124,7 @@ void display(void)
 
 	// Draw coordinate system.
 	glUseProgram(0);
+	glDisable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glPushMatrix();
 
