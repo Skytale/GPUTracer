@@ -47,7 +47,7 @@ are loaded by the main program. However, the second one can be
 constructed from `shader_fragment.glsl` and two other files using a C
 preprocessor:
 
-	$ cpp -DOBJECT_FUNCTIONS='"myObject.glsl"' \
+	$ cpp -P -DOBJECT_FUNCTIONS='"myObject.glsl"' \
 		-DRAY_FUNCTIONS='"myRayMarching.glsl"' \
 		shader_fragment.glsl shader_fragment_final.glsl
 

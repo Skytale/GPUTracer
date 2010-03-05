@@ -37,7 +37,7 @@ float object_shininess = 10;
 
 // This will be processed by CPP. You have to call something like this:
 //
-//     $ cpp -DOBJECT_FUNCTIONS='"myObject.glsl"' \
+//     $ cpp -P -DOBJECT_FUNCTIONS='"myObject.glsl"' \
 //         -DRAY_FUNCTIONS='"myRayMarching.glsl"' \
 //         shader_fragment.glsl shader_fragment_final.glsl
 //
