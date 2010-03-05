@@ -80,8 +80,9 @@ void display(void)
 	// Copy the orientation matrix to a float array. That's needed so we
 	// can pass it to the shaders.
 	float oriMatrix[16];
+	Mat4 T = win.orientationMatrix();
 	for (int i = 0; i < 16; i++)
-		oriMatrix[i] = win.orientationMatrixPtr()[i];
+		oriMatrix[i] = T[i];
 
 	// Same for position of the camera.
 	float fpos[3];

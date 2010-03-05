@@ -124,15 +124,6 @@ class Viewport
 			pos() += axis;
 		}
 
-		double *orientationMatrixPtr()
-		{
-#ifdef MATRIX_ROTATION
-			return ori().ptr();
-#else
-			return ori().makeRotate().ptr();
-#endif
-		}
-
 		Mat4 orientationMatrix()
 		{
 #ifdef MATRIX_ROTATION
@@ -182,6 +173,8 @@ class Viewport
 
 		void dumpInfos()
 		{
+			Mat4 T = orientationMatrix();
+
 			std::cout << std::endl;
 			std::cout << "Camera:" << std::endl;
 			std::cout << "-------" << std::endl;
@@ -194,15 +187,15 @@ class Viewport
 			// Same reason as above, we want to get the negative z-axis
 			// in local coordinates.
 			std::cout << "viewdir "
-				<< -orientationMatrixPtr()[2] << " "
-				<< -orientationMatrixPtr()[6] << " "
-				<< -orientationMatrixPtr()[10] << std::endl;
+				<< -T[2] << " "
+				<< -T[6] << " "
+				<< -T[10] << std::endl;
 
 			// That's T * (0, 1, 0).
 			std::cout << "updir "
-				<< orientationMatrixPtr()[1] << " "
-				<< orientationMatrixPtr()[5] << " "
-				<< orientationMatrixPtr()[9] << std::endl;
+				<< T[1] << " "
+				<< T[5] << " "
+				<< T[9] << std::endl;
 
 			std::cout << std::endl;
 		}
