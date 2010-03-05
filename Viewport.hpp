@@ -27,6 +27,8 @@
 class Viewport
 {
 	private:
+		int _w;
+		int _h;
 		Vec3 _pos;
 		Vec3 _initPos;
 
@@ -38,6 +40,8 @@ class Viewport
 
 	public:
 		Vec3& pos() { return _pos; }
+		int w() { return _w; }
+		int h() { return _h; }
 
 #ifdef MATRIX_ROTATION
 		Mat4& ori() { return _ori; }
@@ -138,6 +142,12 @@ class Viewport
 		void setInitialPosition(Vec3 p)
 		{
 			_initPos = p;
+		}
+
+		void setSize(int w, int h)
+		{
+			_w = w;
+			_h = h;
 		}
 
 		void reset()

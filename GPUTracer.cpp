@@ -34,6 +34,10 @@ static const double movingStep = 0.02;
 static GLint handle_rot;
 static GLint handle_pos;
 
+static bool mouseLook = false;
+static bool mouseInverted = true;
+static double mouseSpeed = 0.1;
+
 void loadShaders(void)
 {
 	const char *vs_source = readFile("shader_vertex.glsl");
@@ -169,21 +173,80 @@ void keyboard(unsigned char key, int x, int y)
 		case ' ':
 			win.dumpInfos();
 			break;
+
+		case 'm':
+			mouseLook = !mouseLook;
+			if (mouseLook)
+			{
+				glutSetCursor(GLUT_CURSOR_NONE);
+
+				// Init the algorithm: Warp to center.
+				glutWarpPointer(win.w() * 0.5, win.h() * 0.5);
+
+				std::cout << "Mouse look activated." << std::endl;
+			}
+			else
+			{
+				glutSetCursor(GLUT_CURSOR_INHERIT);
+				std::cout << "Mouse look deactivated." << std::endl;
+			}
+			break;
+
+		case 'i':
+			mouseInverted = !mouseInverted;
+			if (mouseInverted)
+				std::cout << "Mouse inverted." << std::endl;
+			else
+				std::cout << "Mouse not inverted." << std::endl;
+			break;
 	}
+
+	glutPostRedisplay();
+}
+
+void motion(int x, int y)
+{
+	if (!mouseLook)
+		return;
+
+	// Calc the mouse delta and do the desired moving.
+	// It's always calculated relative to the window's
+	// center because the mouse is warped back there.
+	int dx = x - win.w() * 0.5;
+	int dy = y - win.h() * 0.5;
+
+	// Don't proceed if there's no change. Prevents the
+	// infinite loop that would happen due to mouse
+	// warping.
+	if (dx == 0 && dy == 0)
+		return;
+
+	// Okay, rotate.
+	// mouseSpeed is a factor that's commonly known as
+	// "mouse sensitivity".
+	win.rotateAroundAxis(0, (mouseInverted ? 1 : -1) * mouseSpeed * dy);
+	win.rotateAroundAxis(1, -mouseSpeed * dx);
+
+	// Now warp the pointer back to the center.
+	glutWarpPointer(win.w() * 0.5, win.h() * 0.5);
 
 	glutPostRedisplay();
 }
 
 int main(int argc, char **argv)
 {
+	win.setSize(512, 512);
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(512, 512);
+	glutInitWindowSize(win.w(), win.h());
 	glutCreateWindow("GPU-Tracer");
 
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
+	glutMotionFunc(motion);
+	glutPassiveMotionFunc(motion);
 
 	loadShaders();
 
