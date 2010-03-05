@@ -247,29 +247,44 @@ void keyboard(unsigned char key, int x, int y)
 			std::cout << std::endl;
 			win.dumpInfos();
 			T = win.orientationMatrix();
-			std::cout << "# Headlight:" << std::endl;
-			std::cout << "pointlight" << std::endl;
-			std::cout << "\torigin "
-				<< ( T[0]*light0[0] + T[1]*light0[1] + T[2]*light0[2]
-						+ T[3] + win.pos().x()) << " "
-				<< (T[4]*light0[0] + T[5]*light0[1] + T[6]*light0[2]
-						+ T[7] + win.pos().y()) << " "
-				<< (T[8]*light0[0] + T[9]*light0[1] + T[10]*light0[2]
-						+ T[11] + win.pos().z()) << " "
-				<< std::endl;
-			std::cout << "\tintensity 0.1" << std::endl;
-			std::cout << "end" << std::endl;
-			std::cout << std::endl;
 
-			std::cout << "# Static light:" << std::endl;
-			std::cout << "pointlight" << std::endl;
-			std::cout << "\torigin "
-				<< light1[0] << " "
-				<< light1[1] << " "
-				<< light1[2] << std::endl;
-			std::cout << "\tintensity 0.1" << std::endl;
-			std::cout << "end" << std::endl;
-			std::cout << std::endl;
+			if (light0_enabled)
+			{
+				std::cout << "# Headlight:" << std::endl;
+				std::cout << "spherelight" << std::endl;
+				std::cout << "\torigin "
+					<< ( T[0]*light0[0] + T[1]*light0[1] + T[2]*light0[2]
+							+ T[3] + win.pos().x()) << " "
+					<< (T[4]*light0[0] + T[5]*light0[1] + T[6]*light0[2]
+							+ T[7] + win.pos().y()) << " "
+					<< (T[8]*light0[0] + T[9]*light0[1] + T[10]*light0[2]
+							+ T[11] + win.pos().z()) << " "
+					<< std::endl;
+				std::cout << "\tcolor "
+					<< light0_diffuse[0] << " "
+					<< light0_diffuse[1] << " "
+					<< light0_diffuse[2] << std::endl;
+				std::cout << "\tintensity 0.1" << std::endl;
+				std::cout << "end" << std::endl;
+				std::cout << std::endl;
+			}
+
+			if (light1_enabled)
+			{
+				std::cout << "# Static light:" << std::endl;
+				std::cout << "spherelight" << std::endl;
+				std::cout << "\torigin "
+					<< light1[0] << " "
+					<< light1[1] << " "
+					<< light1[2] << std::endl;
+				std::cout << "\tcolor "
+					<< light1_diffuse[0] << " "
+					<< light1_diffuse[1] << " "
+					<< light1_diffuse[2] << std::endl;
+				std::cout << "\tintensity 0.1" << std::endl;
+				std::cout << "end" << std::endl;
+				std::cout << std::endl;
+			}
 			break;
 
 		case 't':
