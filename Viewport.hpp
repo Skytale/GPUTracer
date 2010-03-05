@@ -31,6 +31,8 @@ class Viewport
 		int _h;
 		Vec3 _pos;
 		Vec3 _initPos;
+		double _movingStep;
+		double _initMovingStep;
 
 #ifdef MATRIX_ROTATION
 		Mat4 _ori;
@@ -107,7 +109,7 @@ class Viewport
 #endif
 		}
 
-		void moveAlongAxis(int whichAxis, double step)
+		void moveAlongAxis(int whichAxis, int dir, bool faster)
 		{
 #ifdef MATRIX_ROTATION
 			Vec3 axis = ori().row(whichAxis);
@@ -117,7 +119,8 @@ class Viewport
 #endif
 
 			axis.normalize();
-			axis *= step;
+			axis *= dir;
+			axis *= (faster ? _movingStep * 10 : _movingStep);
 			pos() += axis;
 		}
 
@@ -139,9 +142,10 @@ class Viewport
 #endif
 		}
 
-		void setInitialPosition(Vec3 p)
+		void setInitialConfig(Vec3 p, double step)
 		{
 			_initPos = p;
+			_initMovingStep = step;
 		}
 
 		void setSize(int w, int h)
@@ -150,10 +154,30 @@ class Viewport
 			_h = h;
 		}
 
+		void increaseSpeed()
+		{
+			_movingStep *= 1.2;
+			std::cout << "Moving speed: " << _movingStep << std::endl;
+		}
+
+		void decreaseSpeed()
+		{
+			_movingStep /= 1.2;
+			std::cout << "Moving speed: " << _movingStep << std::endl;
+		}
+
+		void resetSpeed()
+		{
+			_movingStep = _initMovingStep;
+			std::cout << "Resetting moving speed." << std::endl;
+		}
+
 		void reset()
 		{
 			ori().makeIdentity();
 			pos() = _initPos;
+			_movingStep = _initMovingStep;
+			std::cout << "Resetting everything." << std::endl;
 		}
 
 		void dumpInfos()

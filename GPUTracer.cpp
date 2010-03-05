@@ -30,7 +30,6 @@
 
 Viewport win;
 static const double rotationDegree = 2;
-static const double movingStep = 0.02;
 static GLint handle_rot;
 static GLint handle_pos;
 
@@ -119,12 +118,6 @@ void reshape(int w, int h)
 
 void keyboard(unsigned char key, int x, int y)
 {
-	double mStep = movingStep;
-
-	// Move faster if a mouse button is pressed.
-	if (mouseDown)
-		mStep *= 10;
-
 	switch (key)
 	{
 		case 'q':
@@ -138,33 +131,32 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'w':
 			//std::cout << "Moving forward." << std::endl;
-			win.moveAlongAxis(2, mStep);
+			win.moveAlongAxis(2, 1, mouseDown);
 			break;
 		case 's':
 			//std::cout << "Moving backward." << std::endl;
-			win.moveAlongAxis(2, -mStep);
+			win.moveAlongAxis(2, -1, mouseDown);
 			break;
 
 		case 'a':
 			//std::cout << "Moving left." << std::endl;
-			win.moveAlongAxis(0, -mStep);
+			win.moveAlongAxis(0, -1, mouseDown);
 			break;
 		case 'd':
 			//std::cout << "Moving right." << std::endl;
-			win.moveAlongAxis(0, mStep);
+			win.moveAlongAxis(0, 1, mouseDown);
 			break;
 
 		case 'r':
 			//std::cout << "Moving up." << std::endl;
-			win.moveAlongAxis(1, mStep);
+			win.moveAlongAxis(1, 1, mouseDown);
 			break;
 		case 'f':
 			//std::cout << "Moving down." << std::endl;
-			win.moveAlongAxis(1, -mStep);
+			win.moveAlongAxis(1, -1, mouseDown);
 			break;
 
 		case 'R':
-			std::cout << "Reset." << std::endl;
 			win.reset();
 			break;
 
@@ -239,7 +231,23 @@ void mouse(int button, int state, int x, int y)
 {
 	if (state == GLUT_DOWN)
 	{
-		mouseDown = true;
+		switch (button)
+		{
+			case 1:
+				win.resetSpeed();
+				break;
+
+			case 3:
+				win.increaseSpeed();
+				break;
+
+			case 4:
+				win.decreaseSpeed();
+				break;
+
+			default:
+				mouseDown = true;
+		}
 	}
 	else
 	{
@@ -266,8 +274,9 @@ int main(int argc, char **argv)
 	loadShaders();
 
 	// We don't start at (0, 0, 0). Most objects are centered at that
-	// position so we push the cam a little bit.
-	win.setInitialPosition(Vec3(0, 0, -5));
+	// position so we push the cam a little bit. This also sets the
+	// initial moving step.
+	win.setInitialConfig(Vec3(0, 0, -5), 0.02);
 	win.reset();
 
 	glutMainLoop();
