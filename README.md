@@ -127,6 +127,10 @@ can alter them:
 * `[F5]` to `[F8]` do the same with the second vector.
 * `[F10]` is the equivalent of `[F9]` for the second vector.
 
+By pressing `[Enter]` you switch the target so you can edit the light
+colors with `[F1]` to `[F10]`. Press `[Enter]` again to switch back to
+editing user parameters.
+
 Keys specific to ray marching:
 
 * `[t]` switches to a large initial step size. Expect to get artifacts.

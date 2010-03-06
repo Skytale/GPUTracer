@@ -82,6 +82,9 @@ static float user_params[][4] =
 	};
 static float user_params_steps[] = { 0.1, 1.0 };
 
+// 0 = change user settings with F1-F10, 1 = change light settings.
+static int settings_target = 0;
+
 void loadShaders(void)
 {
 	const char *vs_source = readFile("shader_vertex.glsl");
@@ -234,10 +237,83 @@ void reshape(int w, int h)
 	glLoadIdentity();
 }
 
+void tellUserParams()
+{
+	std::cout << "User parameters:" << std::endl;
+	std::cout << "----------------" << std::endl;
+	std::cout << "user_params0 = vec4("
+		<< user_params[0][0] << ", "
+		<< user_params[0][1] << ", "
+		<< user_params[0][2] << ", "
+		<< user_params[0][3] << ");"
+		<< std::endl;
+	std::cout << "user_params1 = vec4("
+		<< user_params[1][0] << ", "
+		<< user_params[1][1] << ", "
+		<< user_params[1][2] << ", "
+		<< user_params[1][3] << ");"
+		<< std::endl;
+	std::cout << "user_params0_step = "
+		<< user_params_steps[0] << ";" << std::endl;
+	std::cout << "user_params1_step = "
+		<< user_params_steps[1] << ";" << std::endl;
+	std::cout << std::endl;
+}
+
+void tellLights()
+{
+	Mat4 T = win.orientationMatrix();
+
+	if (lights_enabled[0])
+	{
+		std::cout << "# Headlight:" << std::endl;
+		std::cout << "spherelight" << std::endl;
+		std::cout << "\torigin "
+			<< ( T[0]*lights[0][0]
+					+ T[1]*lights[0][1]
+					+ T[2]*lights[0][2]
+					+ T[3] + win.pos().x()) << " "
+			<< (T[4]*lights[0][0]
+					+ T[5]*lights[0][1]
+					+ T[6]*lights[0][2]
+					+ T[7] + win.pos().y()) << " "
+			<< (T[8]*lights[0][0]
+					+ T[9]*lights[0][1]
+					+ T[10]*lights[0][2]
+					+ T[11] + win.pos().z()) << " "
+			<< std::endl;
+		std::cout << "\tcolor "
+			<< lights_diffuse[0][0] << " "
+			<< lights_diffuse[0][1] << " "
+			<< lights_diffuse[0][2] << std::endl;
+		std::cout << "\tintensity 0.1" << std::endl;
+		std::cout << "end" << std::endl;
+		std::cout << std::endl;
+	}
+
+	if (lights_enabled[1])
+	{
+		std::cout << "# Static light:" << std::endl;
+		std::cout << "spherelight" << std::endl;
+		std::cout << "\torigin "
+			<< lights[1][0] << " "
+			<< lights[1][1] << " "
+			<< lights[1][2] << std::endl;
+		std::cout << "\tcolor "
+			<< lights_diffuse[1][0] << " "
+			<< lights_diffuse[1][1] << " "
+			<< lights_diffuse[1][2] << std::endl;
+		std::cout << "\tintensity 1.0" << std::endl;
+		std::cout << "end" << std::endl;
+		std::cout << std::endl;
+	}
+
+	std::cout << "Lights step size: " << lights_step << std::endl;
+	std::cout << std::endl;
+}
+
 void keyboard(unsigned char key, int x, int y)
 {
-	Mat4 T;
-
 	switch (key)
 	{
 		case 'q':
@@ -283,51 +359,7 @@ void keyboard(unsigned char key, int x, int y)
 		case ' ':
 			std::cout << std::endl;
 			win.dumpInfos();
-			T = win.orientationMatrix();
-
-			if (lights_enabled[0])
-			{
-				std::cout << "# Headlight:" << std::endl;
-				std::cout << "spherelight" << std::endl;
-				std::cout << "\torigin "
-					<< ( T[0]*lights[0][0]
-							+ T[1]*lights[0][1]
-							+ T[2]*lights[0][2]
-							+ T[3] + win.pos().x()) << " "
-					<< (T[4]*lights[0][0]
-							+ T[5]*lights[0][1]
-							+ T[6]*lights[0][2]
-							+ T[7] + win.pos().y()) << " "
-					<< (T[8]*lights[0][0]
-							+ T[9]*lights[0][1]
-							+ T[10]*lights[0][2]
-							+ T[11] + win.pos().z()) << " "
-					<< std::endl;
-				std::cout << "\tcolor "
-					<< lights_diffuse[0][0] << " "
-					<< lights_diffuse[0][1] << " "
-					<< lights_diffuse[0][2] << std::endl;
-				std::cout << "\tintensity 0.1" << std::endl;
-				std::cout << "end" << std::endl;
-				std::cout << std::endl;
-			}
-
-			if (lights_enabled[1])
-			{
-				std::cout << "# Static light:" << std::endl;
-				std::cout << "spherelight" << std::endl;
-				std::cout << "\torigin "
-					<< lights[1][0] << " "
-					<< lights[1][1] << " "
-					<< lights[1][2] << std::endl;
-				std::cout << "\tcolor "
-					<< lights_diffuse[1][0] << " "
-					<< lights_diffuse[1][1] << " "
-					<< lights_diffuse[1][2] << std::endl;
-				std::cout << "\tintensity 1.0" << std::endl;
-				std::cout << "end" << std::endl;
-				std::cout << std::endl;
-			}
+			tellLights();
 			break;
 
 		case 't':
@@ -401,6 +433,16 @@ void keyboard(unsigned char key, int x, int y)
 		case 27:
 			exit(EXIT_SUCCESS);
 			break;
+
+		case 13:
+			if (settings_target == 0)
+				settings_target = 1;
+			else
+				settings_target = 0;
+			std::cout << "Settings target: "
+				<< (settings_target == 0 ? "user_params" : "lights")
+				<< std::endl;
+			break;
 	}
 
 	glutPostRedisplay();
@@ -409,115 +451,130 @@ void keyboard(unsigned char key, int x, int y)
 void keyboardSpecial(int key, int x, int y)
 {
 	bool isShift = ((glutGetModifiers() & GLUT_ACTIVE_SHIFT) != 0);
-	bool tellUserParams = true;
 	bool changed = true;
+	int target = -1;
+	int target_index = -1;
+	int step_target = -1;
 
 	switch (key)
 	{
 		case GLUT_KEY_DOWN:
 			win.setFOV(win.fov() * 1.05);
-			tellUserParams = false;
 			break;
 
 		case GLUT_KEY_UP:
 			win.setFOV(win.fov() / 1.05);
-			tellUserParams = false;
 			break;
 
 		case GLUT_KEY_F1:
-			if (isShift)
-				user_params[0][0] -= user_params_steps[0];
-			else
-				user_params[0][0] += user_params_steps[0];
+			target = 0;
+			target_index = 0;
 			break;
 
 		case GLUT_KEY_F2:
-			if (isShift)
-				user_params[0][1] -= user_params_steps[0];
-			else
-				user_params[0][1] += user_params_steps[0];
+			target = 0;
+			target_index = 1;
 			break;
 
 		case GLUT_KEY_F3:
-			if (isShift)
-				user_params[0][2] -= user_params_steps[0];
-			else
-				user_params[0][2] += user_params_steps[0];
+			target = 0;
+			target_index = 2;
 			break;
 
 		case GLUT_KEY_F4:
-			if (isShift)
-				user_params[0][3] -= user_params_steps[0];
-			else
-				user_params[0][3] += user_params_steps[0];
+			target = 0;
+			target_index = 3;
 			break;
 
 		case GLUT_KEY_F5:
-			if (isShift)
-				user_params[1][0] -= user_params_steps[1];
-			else
-				user_params[1][0] += user_params_steps[1];
+			target = 1;
+			target_index = 0;
 			break;
 
 		case GLUT_KEY_F6:
-			if (isShift)
-				user_params[1][1] -= user_params_steps[1];
-			else
-				user_params[1][1] += user_params_steps[1];
+			target = 1;
+			target_index = 1;
 			break;
 
 		case GLUT_KEY_F7:
-			if (isShift)
-				user_params[1][2] -= user_params_steps[1];
-			else
-				user_params[1][2] += user_params_steps[1];
+			target = 1;
+			target_index = 2;
 			break;
 
 		case GLUT_KEY_F8:
-			if (isShift)
-				user_params[1][3] -= user_params_steps[1];
-			else
-				user_params[1][3] += user_params_steps[1];
+			target = 1;
+			target_index = 3;
 			break;
 
 		case GLUT_KEY_F9:
-			if (isShift)
-				user_params_steps[0] /= 1.1;
-			else
-				user_params_steps[0] *= 1.1;
+			step_target = 0;
 			changed = false;
 			break;
 
 		case GLUT_KEY_F10:
-			if (isShift)
-				user_params_steps[1] /= 1.1;
-			else
-				user_params_steps[1] *= 1.1;
+			step_target = 1;
 			changed = false;
 			break;
 	}
 
-	if (tellUserParams)
+	if (target != -1)
 	{
-		std::cout << "User parameters:" << std::endl;
-		std::cout << "----------------" << std::endl;
-		std::cout << "user_params0 = vec4("
-			<< user_params[0][0] << ", "
-			<< user_params[0][1] << ", "
-			<< user_params[0][2] << ", "
-			<< user_params[0][3] << ");"
-			<< std::endl;
-		std::cout << "user_params1 = vec4("
-			<< user_params[1][0] << ", "
-			<< user_params[1][1] << ", "
-			<< user_params[1][2] << ", "
-			<< user_params[1][3] << ");"
-			<< std::endl;
-		std::cout << "user_params0_step = "
-			<< user_params_steps[0] << ";" << std::endl;
-		std::cout << "user_params1_step = "
-			<< user_params_steps[1] << ";" << std::endl;
-		std::cout << std::endl;
+		if (settings_target == 0)
+		{
+			// Set user parameters
+			float add;
+			if (isShift)
+				add = -user_params_steps[target];
+			else
+				add = +user_params_steps[target];
+
+			user_params[target][target_index] += add;
+
+			tellUserParams();
+		}
+		else if (settings_target == 1 && target < 3)
+		{
+			// Set lights
+			float add;
+			if (isShift)
+				add = -lights_step;
+			else
+				add = +lights_step;
+
+			lights_diffuse[target][target_index] += add;
+
+			// Clip
+			if (lights_diffuse[target][target_index] > 1.0)
+				lights_diffuse[target][target_index] = 1.0;
+			else if (lights_diffuse[target][target_index] < 0.0)
+				lights_diffuse[target][target_index] = 0.0;
+
+			tellLights();
+		}
+	}
+
+	if (step_target != -1)
+	{
+		if (settings_target == 0)
+		{
+			// Set user_params step size
+			if (isShift)
+				user_params_steps[step_target] /= 1.1;
+			else
+				user_params_steps[step_target] *= 1.1;
+
+			tellUserParams();
+		}
+		else if (settings_target == 1)
+		{
+			// Set lights step size
+			if (isShift)
+				lights_step /= 1.1;
+			else
+				lights_step *= 1.1;
+
+			tellLights();
+		}
 	}
 
 	if (changed)
