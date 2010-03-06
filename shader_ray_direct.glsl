@@ -18,10 +18,10 @@
 */
 
 
-bool findIntersection(in vec3 orig, in vec3 dir,
-		inout float dist, inout vec3 hitpoint, inout vec3 normal)
+bool findIntersection(in vec3 orig, in vec3 dir, inout vec3 hitpoint,
+	inout vec3 normal)
 {
 	// The object can do direct intersection tests. That's used for
 	// primitives such as spheres.
-	return getIntersection(orig, dir, dist, hitpoint, normal);
+	return getIntersection(orig, dir, hitpoint, normal);
 }

@@ -18,8 +18,8 @@
 */
 
 
-bool getIntersection(in vec3 orig, in vec3 dir,
-		inout float dist, inout vec3 hitpoint, inout vec3 normal)
+bool getIntersection(in vec3 orig, in vec3 dir, inout vec3 hitpoint,
+	inout vec3 normal)
 {
 	// Simple sphere intersection. To be used with direct rays.
 	vec3 sphere_origin = vec3(0, 0, 0);
@@ -37,17 +37,14 @@ bool getIntersection(in vec3 orig, in vec3 dir,
 
 	float a = sqrt(sphere_radius2 - distToCenter2);
 	if (alpha >= a)
-		dist = alpha - a;
+		alpha -= a;
 	else if (alpha + a > 0)
-		dist = alpha + a;
+		alpha += a;
 	else
 		return false;
 
 	// We finally got our hitpoint and the normal at this point.
-	hitpoint = orig + dist * dir;
+	hitpoint = orig + alpha * dir;
 	normal   = normalize(hitpoint - sphere_origin);
-
-	// Push hitpoint by an epsilon to avoid artifacts.
-	hitpoint += 1e-5 * normal;
 	return true;
 }

@@ -101,10 +101,9 @@ void main(void)
 	vec3 ray = normalize(poi - eye);
 
 	// Does this ray hit the surface of the object?
-	float alpha = 0;
 	vec3 hitpoint;
 	vec3 normal;
-	if (!findIntersection(eye, ray, alpha, hitpoint, normal))
+	if (!findIntersection(eye, ray, hitpoint, normal))
 	{
 		// Draw a dark grey on ray misses. Makes debugging easier.
 		gl_FragColor = vec4(0.05, 0.05, 0.05, 1);

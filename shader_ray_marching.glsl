@@ -24,51 +24,59 @@ uniform float accuracy;
 float maxval = 10;
 float normalEps = 1e-5;
 
-bool findIntersection(in vec3 orig, in vec3 dir,
-		inout float dist, inout vec3 hitpoint, inout vec3 normal)
+bool findIntersection(in vec3 orig, in vec3 dir, inout vec3 hitpoint,
+	inout vec3 normal)
 {
 	// Raymarching with fixed initial step size and final bisection.
 	// The object has to define evalAt().
-	vec3 at = orig + dist * dir;
+	float cstep = stepsize;
+	float alpha = cstep;
+
+	vec3 at = orig + alpha * dir;
 	float val = evalAt(at);
 	bool sit = (val < 0.0);
-	bool sitStart = sit;
-	float cstep = stepsize;
 
-	for (dist = cstep; dist < maxval; dist += cstep)
+	alpha += cstep;
+
+	bool sitStart = sit;
+
+	while (alpha < maxval)
 	{
-		at = orig + dist * dir;
+		at = orig + alpha * dir;
 		val = evalAt(at);
 		sit = (val < 0.0);
 
 		// Situation changed, start bisection.
 		if (sit != sitStart)
 		{
-			float a1 = dist - stepsize;
+			float a1 = alpha - stepsize;
 
 			while (cstep > accuracy)
 			{
 				cstep *= 0.5;
-				dist = a1 + cstep;
+				alpha = a1 + cstep;
 
-				at = orig + dist * dir;
+				at = orig + alpha * dir;
 				val = evalAt(at);
 				sit = (val < 0.0);
 
 				if (sit == sitStart)
-					a1 = dist;
+					a1 = alpha;
 			}
 
 			hitpoint = at;
 
 			// "Finite difference thing". :)
-			float gx = evalAt(vec3(at.x + normalEps, at.yz));
-			float gy = evalAt(vec3(at.x, at.y + normalEps, at.z));
-			float gz = evalAt(vec3(at.xy, at.z + normalEps));
-			normal = normalize(vec3(gx - val, gy - val, gz - val));
+			normal.x = evalAt(at + vec3(normalEps, 0, 0));
+			normal.y = evalAt(at + vec3(0, normalEps, 0));
+			normal.z = evalAt(at + vec3(0, 0, normalEps));
+			normal -= val;
+			normal = normalize(normal);
 
 			return true;
 		}
+
+		alpha += cstep;
 	}
 
 	return false;
