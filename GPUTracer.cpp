@@ -43,6 +43,7 @@ static bool mouseLook = false;
 static bool mouseInverted = true;
 static double mouseSpeed = 0.1;
 static bool mouseDown = false;
+static bool drawCS = true;
 
 static bool raymarching_hq = false;
 
@@ -183,41 +184,45 @@ void display(void)
 	glVertex3f(-r,  1,  0);
 	glEnd();
 
-	// Draw coordinate system.
-	glUseProgram(0);
-	glDisable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST);
-	glPushMatrix();
+	// Draw coordinate system?
+	if (drawCS)
+	{
+		glUseProgram(0);
+		glDisable(GL_LIGHTING);
+		glEnable(GL_DEPTH_TEST);
+		glPushMatrix();
 
-	glLineWidth(3.0);
+		glLineWidth(3.0);
 
-	// In y direction, move to -0.75.
-	// In x direction, move to  0.75. From that point on, add the
-	// difference of width and height in world coordinates. This will
-	// keep the (drawn) coordinate system at a position with a fixed
-	// margin to the window borders.
-	glTranslated(0.75 + (win.w() - win.h()) / (double)win.h(), -0.75, 0);
-	glScaled(0.2, 0.2, 0.2);
-	glMultMatrixf(oriMatrix);
+		// In y direction, move to -0.75.
+		// In x direction, move to  0.75. From that point on, add the
+		// difference of width and height in world coordinates. This
+		// will keep the (drawn) coordinate system at a position with a
+		// fixed margin to the window borders.
+		glTranslated(0.75 + (win.w() - win.h()) / (double)win.h(),
+				-0.75, 0);
+		glScaled(0.2, 0.2, 0.2);
+		glMultMatrixf(oriMatrix);
 
-	glBegin(GL_LINES);
+		glBegin(GL_LINES);
 
-	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(1, 0, 0);
+		glColor3f(1.0, 0.0, 0.0);
+		glVertex3f(0, 0, 0);
+		glVertex3f(1, 0, 0);
 
-	glColor3f(0.0, 1.0, 0.0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 1, 0);
+		glColor3f(0.0, 1.0, 0.0);
+		glVertex3f(0, 0, 0);
+		glVertex3f(0, 1, 0);
 
-	glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 0, 1);
+		glColor3f(0.0, 0.0, 1.0);
+		glVertex3f(0, 0, 0);
+		glVertex3f(0, 0, 1);
 
-	glEnd();
+		glEnd();
 
-	glPopMatrix();
-	glDisable(GL_DEPTH_TEST);
+		glPopMatrix();
+		glDisable(GL_DEPTH_TEST);
+	}
 
 	glutSwapBuffers();
 }
@@ -405,6 +410,10 @@ void keyboard(unsigned char key, int x, int y)
 
 		case '2':
 			lights_enabled[1] = !lights_enabled[1];
+			break;
+
+		case 'c':
+			drawCS = !drawCS;
 			break;
 
 		case 'm':

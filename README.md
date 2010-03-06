@@ -116,6 +116,7 @@ General keys:
   resets your speed.
 * `[Space]` prints out scene information such as the camera position.
 * `[1]` and `[2]` toggle the lights.
+* `[c]` toggles drawing of the coordinate system.
 * `[Esc]` quits.
 
 Two `vec4`'s are passed to the shaders as user settings. This is how you
