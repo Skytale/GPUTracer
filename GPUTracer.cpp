@@ -314,6 +314,8 @@ void tellLights()
 
 void keyboard(unsigned char key, int x, int y)
 {
+	bool changed = true;
+
 	switch (key)
 	{
 		case 'q':
@@ -360,6 +362,7 @@ void keyboard(unsigned char key, int x, int y)
 			std::cout << std::endl;
 			win.dumpInfos();
 			tellLights();
+			changed = false;
 			break;
 
 		case 't':
@@ -420,6 +423,7 @@ void keyboard(unsigned char key, int x, int y)
 				glutSetCursor(GLUT_CURSOR_INHERIT);
 				std::cout << "Mouse look deactivated." << std::endl;
 			}
+			changed = false;
 			break;
 
 		case 'i':
@@ -428,6 +432,7 @@ void keyboard(unsigned char key, int x, int y)
 				std::cout << "Mouse inverted." << std::endl;
 			else
 				std::cout << "Mouse not inverted." << std::endl;
+			changed = false;
 			break;
 
 		case 27:
@@ -442,10 +447,12 @@ void keyboard(unsigned char key, int x, int y)
 			std::cout << "Settings target: "
 				<< (settings_target == 0 ? "user_params" : "lights")
 				<< std::endl;
+			changed = false;
 			break;
 	}
 
-	glutPostRedisplay();
+	if (changed)
+		glutPostRedisplay();
 }
 
 void keyboardSpecial(int key, int x, int y)
