@@ -44,26 +44,35 @@ float evalAt(vec3 at)
 		float sinThe = planeXY / r;
 		float cosThe = z.z / r;
 
-		for (float cascade = 0; cascade < 3; cascade += 1)
-		{
-			float sinPhi2 = 2.0 * sinPhi * cosPhi;
-			float cosPhi2 = 2.0 * cosPhi * cosPhi - 1.0;
-			float sinThe2 = 2.0 * sinThe * cosThe;
-			float cosThe2 = 2.0 * cosThe * cosThe - 1.0;
+		// First cascade level.
+		sinPhi = 2.0 * sinPhi * cosPhi;
+		cosPhi = 2.0 * cosPhi * cosPhi - 1.0;
+		sinThe = 2.0 * sinThe * cosThe;
+		cosThe = 2.0 * cosThe * cosThe - 1.0;
 
-			sinPhi = sinPhi2;
-			cosPhi = cosPhi2;
-			sinThe = sinThe2;
-			cosThe = cosThe2;
-		}
+		// Second cascade level.
+		sinPhi = 2.0 * sinPhi * cosPhi;
+		cosPhi = 2.0 * cosPhi * cosPhi - 1.0;
+		sinThe = 2.0 * sinThe * cosThe;
+		cosThe = 2.0 * cosThe * cosThe - 1.0;
 
-		float rPow = 1;
-		for (float i = 0; i < 8; i += 1)
-			rPow *= r;
+		// Third cascade level.
+		sinPhi = 2.0 * sinPhi * cosPhi;
+		cosPhi = 2.0 * cosPhi * cosPhi - 1.0;
+		sinThe = 2.0 * sinThe * cosThe;
+		cosThe = 2.0 * cosThe * cosThe - 1.0;
 
-		z.x = rPow * sinThe * cosPhi  +  c.x;
-		z.y = rPow * sinThe * sinPhi  +  c.y;
-		z.z = rPow * cosThe           +  c.z;
+		// rPow = pow(r, 8)
+		float rPow = r * r;
+		rPow *= rPow;
+		rPow *= rPow;
+
+		// Set new z.
+		z.x = sinThe * cosPhi;
+		z.y = sinThe * sinPhi;
+		z.z = cosThe;
+		z *= rPow;
+		z += c;
 	}
 
 	return r - 2.0;
