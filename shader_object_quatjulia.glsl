@@ -42,12 +42,14 @@ float evalAt(vec3 at)
 	vec4 z  = vec4(at, 0.0);
 	vec4 z2 = vec4(1, 0, 0, 0);
 
-	// Hardcoded constant. Maybe change this later.
-	vec4 c = vec4(-0.2, 0.6, 0.2, 0.2);
+	// Read julia settings from first user parameters.
+	vec4 c = user_params0;
 
 	float n = 0;
 	float sqr_abs_z = 0.0;
-	while (n < 8)
+
+	// Read nMax from first item of second user parameters.
+	while (n < user_params1.s)
 	{
 		z2 = quatProd(z, z2) * 2.0;
 		z  = quatSq(z) + c;

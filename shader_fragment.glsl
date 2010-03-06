@@ -24,6 +24,9 @@ uniform mat4 rot;
 uniform vec3 pos;
 uniform float eyedist;
 
+uniform vec4 user_params0;
+uniform vec4 user_params1;
+
 vec3 light0 = gl_LightSource[0].position.xyz;
 vec3 light0_diffuse = gl_LightSource[0].diffuse.xyz;
 vec3 light0_specular = gl_LightSource[0].specular.xyz;

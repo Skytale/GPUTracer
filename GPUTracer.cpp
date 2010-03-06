@@ -36,6 +36,8 @@ static GLint handle_pos;
 static GLint handle_eyedist;
 static GLint handle_stepsize;
 static GLint handle_accuracy;
+static GLint handle_user_params0;
+static GLint handle_user_params1;
 
 static bool mouseLook = false;
 static bool mouseInverted = true;
@@ -64,6 +66,11 @@ static float light0_specular[] = { 1.0,  1.0,  1.0,  1.0};
 static float light1[]          = {10.0,  0.0,  0.0,  0.0};
 static float light1_diffuse[]  = { 0.3,  0.3,  1.0,  1.0};
 static float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
+
+static float user_params0[] = {0.0, 0.0, 0.0, 0.0};
+static float user_params1[] = {5.0, 5.0, 5.0, 5.0};
+static float user_params0_step = 0.1;
+static float user_params1_step = 1.0;
 
 void loadShaders(void)
 {
@@ -97,6 +104,8 @@ void loadShaders(void)
 	handle_eyedist = glGetUniformLocation(shader, "eyedist");
 	handle_stepsize = glGetUniformLocation(shader, "stepsize");
 	handle_accuracy = glGetUniformLocation(shader, "accuracy");
+	handle_user_params0 = glGetUniformLocation(shader, "user_params0");
+	handle_user_params1 = glGetUniformLocation(shader, "user_params1");
 }
 
 void display(void)
@@ -148,6 +157,8 @@ void display(void)
 	glUniform1f(handle_eyedist, win.eyedist());
 	glUniform1f(handle_stepsize, raymarching_stepsize);
 	glUniform1f(handle_accuracy, raymarching_accuracy);
+	glUniform4fv(handle_user_params0, 1, user_params0);
+	glUniform4fv(handle_user_params1, 1, user_params1);
 
 	// Draw one quad so that we get one fragment covering the whole
 	// screen.
@@ -381,18 +392,120 @@ void keyboard(unsigned char key, int x, int y)
 
 void keyboardSpecial(int key, int x, int y)
 {
+	bool isShift = ((glutGetModifiers() & GLUT_ACTIVE_SHIFT) != 0);
+	bool tellUserParams = true;
+	bool changed = true;
+
 	switch (key)
 	{
 		case GLUT_KEY_DOWN:
 			win.setFOV(win.fov() * 1.05);
+			tellUserParams = false;
 			break;
 
 		case GLUT_KEY_UP:
 			win.setFOV(win.fov() / 1.05);
+			tellUserParams = false;
+			break;
+
+		case GLUT_KEY_F1:
+			if (isShift)
+				user_params0[0] -= user_params0_step;
+			else
+				user_params0[0] += user_params0_step;
+			break;
+
+		case GLUT_KEY_F2:
+			if (isShift)
+				user_params0[1] -= user_params0_step;
+			else
+				user_params0[1] += user_params0_step;
+			break;
+
+		case GLUT_KEY_F3:
+			if (isShift)
+				user_params0[2] -= user_params0_step;
+			else
+				user_params0[2] += user_params0_step;
+			break;
+
+		case GLUT_KEY_F4:
+			if (isShift)
+				user_params0[3] -= user_params0_step;
+			else
+				user_params0[3] += user_params0_step;
+			break;
+
+		case GLUT_KEY_F5:
+			if (isShift)
+				user_params1[0] -= user_params1_step;
+			else
+				user_params1[0] += user_params1_step;
+			break;
+
+		case GLUT_KEY_F6:
+			if (isShift)
+				user_params1[1] -= user_params1_step;
+			else
+				user_params1[1] += user_params1_step;
+			break;
+
+		case GLUT_KEY_F7:
+			if (isShift)
+				user_params1[2] -= user_params1_step;
+			else
+				user_params1[2] += user_params1_step;
+			break;
+
+		case GLUT_KEY_F8:
+			if (isShift)
+				user_params1[3] -= user_params1_step;
+			else
+				user_params1[3] += user_params1_step;
+			break;
+
+		case GLUT_KEY_F9:
+			if (isShift)
+				user_params0_step /= 1.1;
+			else
+				user_params0_step *= 1.1;
+			changed = false;
+			break;
+
+		case GLUT_KEY_F10:
+			if (isShift)
+				user_params1_step /= 1.1;
+			else
+				user_params1_step *= 1.1;
+			changed = false;
 			break;
 	}
 
-	glutPostRedisplay();
+	if (tellUserParams)
+	{
+		std::cout << "User parameters:" << std::endl;
+		std::cout << "----------------" << std::endl;
+		std::cout << "user_params0 = vec4("
+			<< user_params0[0] << ", "
+			<< user_params0[1] << ", "
+			<< user_params0[2] << ", "
+			<< user_params0[3] << ");"
+			<< std::endl;
+		std::cout << "user_params1 = vec4("
+			<< user_params1[0] << ", "
+			<< user_params1[1] << ", "
+			<< user_params1[2] << ", "
+			<< user_params1[3] << ");"
+			<< std::endl;
+		std::cout << "user_params0_step = "
+			<< user_params0_step << ";" << std::endl;
+		std::cout << "user_params1_step = "
+			<< user_params1_step << ";" << std::endl;
+		std::cout << std::endl;
+	}
+
+	if (changed)
+		glutPostRedisplay();
 }
 
 void motion(int x, int y)
