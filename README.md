@@ -118,9 +118,19 @@ General keys:
 * `[1]` and `[2]` toggle the lights.
 * `[Esc]` quits.
 
+Two `vec4`'s are passed to the shaders as user settings. This is how you
+can alter them:
+
+* `[F1]` to `[F4]` increase the entries of the first vector. Holding
+  `[Shift]` decreases the values.
+* `[F9]` increases the value that will be added.
+* `[F5]` to `[F8]` do the same with the second vector.
+* `[F10]` is the equivalent of `[F9]` for the second vector.
+
 Keys specific to ray marching:
 
 * `[t]` switches to a large initial step size. Expect to get artifacts.
 * `[T]` switches to a smaller step size. Expect this to be very slow.
 * `[g]` switches to a low accuracy when doing bisection.
 * `[G]` switches to a higher accuracy when doing bisection.
+* `[h]` toggles both step size and accuracy at once.
