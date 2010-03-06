@@ -45,6 +45,8 @@ static bool mouseDown = false;
 static bool light0_enabled = true;
 static bool light1_enabled = true;
 
+static bool raymarching_hq = false;
+
 static float raymarching_stepsize_hi = 0.01;
 static float raymarching_stepsize_lo = 0.2;
 static float raymarching_stepsize = raymarching_stepsize_lo;
@@ -303,18 +305,36 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 't':
 			raymarching_stepsize = raymarching_stepsize_lo;
+			raymarching_hq = false;
 			break;
 
 		case 'T':
 			raymarching_stepsize = raymarching_stepsize_hi;
+			raymarching_hq = false;
 			break;
 
 		case 'g':
 			raymarching_accuracy = raymarching_accuracy_lo;
+			raymarching_hq = false;
 			break;
 
 		case 'G':
 			raymarching_accuracy = raymarching_accuracy_hi;
+			raymarching_hq = false;
+			break;
+
+		case 'h':
+			raymarching_hq = !raymarching_hq;
+			if (raymarching_hq)
+			{
+				raymarching_stepsize = raymarching_stepsize_hi;
+				raymarching_accuracy = raymarching_accuracy_hi;
+			}
+			else
+			{
+				raymarching_stepsize = raymarching_stepsize_lo;
+				raymarching_accuracy = raymarching_accuracy_lo;
+			}
 			break;
 
 		case '1':
