@@ -308,7 +308,7 @@ void keyboard(unsigned char key, int x, int y)
 					<< light1_diffuse[0] << " "
 					<< light1_diffuse[1] << " "
 					<< light1_diffuse[2] << std::endl;
-				std::cout << "\tintensity 0.1" << std::endl;
+				std::cout << "\tintensity 1.0" << std::endl;
 				std::cout << "end" << std::endl;
 				std::cout << std::endl;
 			}

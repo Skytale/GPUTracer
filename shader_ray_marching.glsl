@@ -35,7 +35,7 @@ bool findIntersection(in vec3 orig, in vec3 dir,
 	bool sitStart = sit;
 	float cstep = stepsize;
 
-	for (dist = 0; dist < maxval; dist += cstep)
+	for (dist = cstep; dist < maxval; dist += cstep)
 	{
 		at = orig + dist * dir;
 		val = evalAt(at);
@@ -45,7 +45,6 @@ bool findIntersection(in vec3 orig, in vec3 dir,
 		if (sit != sitStart)
 		{
 			float a1 = dist - stepsize;
-			float a2 = dist;
 
 			while (cstep > accuracy)
 			{
