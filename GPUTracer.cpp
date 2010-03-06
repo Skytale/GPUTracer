@@ -44,9 +44,6 @@ static bool mouseInverted = true;
 static double mouseSpeed = 0.1;
 static bool mouseDown = false;
 
-static bool light0_enabled = true;
-static bool light1_enabled = true;
-
 static bool raymarching_hq = false;
 
 static float raymarching_stepsize_hi = 0.01;
@@ -60,17 +57,30 @@ static float raymarching_accuracy = raymarching_accuracy_lo;
 // Light0 specifies the headlight. Its "position" is added to the
 // current position of the eye.
 // Light1 is a static light somewhere in the scene.
-static float light0[]          = { 0.0,  0.5,  0.0,  0.0};
-static float light0_diffuse[]  = { 1.0,  1.0,  1.0,  1.0};
-static float light0_specular[] = { 1.0,  1.0,  1.0,  1.0};
-static float light1[]          = {10.0,  0.0,  0.0,  0.0};
-static float light1_diffuse[]  = { 0.3,  0.3,  1.0,  1.0};
-static float light1_specular[] = { 0.3,  0.3,  1.0,  1.0};
+static float lights[][4] =
+	{
+		{  0.0, 0.5, 0.0, 0.0 },
+		{ 10.0, 0.0, 0.0, 0.0 }
+	};
+static float lights_diffuse[][4] =
+	{
+		{ 1.0, 1.0, 1.0, 1.0 },
+		{ 0.3, 0.3, 1.0, 1.0 }
+	};
+static float lights_specular[][4] =
+	{
+		{ 1.0, 1.0, 1.0, 1.0 },
+		{ 0.3, 0.3, 1.0, 1.0 }
+	};
+static bool lights_enabled[] = { true, true };
+static float lights_step = 0.1;
 
-static float user_params0[] = {0.0, 0.0, 0.0, 0.0};
-static float user_params1[] = {5.0, 5.0, 5.0, 5.0};
-static float user_params0_step = 0.1;
-static float user_params1_step = 1.0;
+static float user_params[][4] =
+	{
+		{ 0.0, 0.0, 0.0, 0.0 },
+		{ 5.0, 5.0, 5.0, 5.0 }
+	};
+static float user_params_steps[] = { 0.1, 1.0 };
 
 void loadShaders(void)
 {
@@ -116,25 +126,25 @@ void display(void)
 
 	// Enable light sources.
 	glEnable(GL_LIGHTING);
-	if (light0_enabled)
+	if (lights_enabled[0])
 	{
 		// Abuse GL_SPOT_CUTOFF as a switch to toggle the light.
 		glEnable(GL_LIGHT0);
 		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 1.0f);
-		glLightfv(GL_LIGHT0, GL_POSITION, light0);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE,  light0_diffuse);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+		glLightfv(GL_LIGHT0, GL_POSITION, lights[0]);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE,  lights_diffuse[0]);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, lights_specular[0]);
 	}
 	else
 		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 0.0f);
 
-	if (light1_enabled)
+	if (lights_enabled[1])
 	{
 		glEnable(GL_LIGHT1);
 		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 1.0f);
-		glLightfv(GL_LIGHT1, GL_POSITION, light1);
-		glLightfv(GL_LIGHT1, GL_DIFFUSE,  light1_diffuse);
-		glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+		glLightfv(GL_LIGHT1, GL_POSITION, lights[1]);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE,  lights_diffuse[1]);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, lights_specular[1]);
 	}
 	else
 		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 0.0f);
@@ -157,8 +167,8 @@ void display(void)
 	glUniform1f(handle_eyedist, win.eyedist());
 	glUniform1f(handle_stepsize, raymarching_stepsize);
 	glUniform1f(handle_accuracy, raymarching_accuracy);
-	glUniform4fv(handle_user_params0, 1, user_params0);
-	glUniform4fv(handle_user_params1, 1, user_params1);
+	glUniform4fv(handle_user_params0, 1, user_params[0]);
+	glUniform4fv(handle_user_params1, 1, user_params[1]);
 
 	// Draw one quad so that we get one fragment covering the whole
 	// screen.
@@ -275,39 +285,45 @@ void keyboard(unsigned char key, int x, int y)
 			win.dumpInfos();
 			T = win.orientationMatrix();
 
-			if (light0_enabled)
+			if (lights_enabled[0])
 			{
 				std::cout << "# Headlight:" << std::endl;
 				std::cout << "spherelight" << std::endl;
 				std::cout << "\torigin "
-					<< ( T[0]*light0[0] + T[1]*light0[1] + T[2]*light0[2]
+					<< ( T[0]*lights[0][0]
+							+ T[1]*lights[0][1]
+							+ T[2]*lights[0][2]
 							+ T[3] + win.pos().x()) << " "
-					<< (T[4]*light0[0] + T[5]*light0[1] + T[6]*light0[2]
+					<< (T[4]*lights[0][0]
+							+ T[5]*lights[0][1]
+							+ T[6]*lights[0][2]
 							+ T[7] + win.pos().y()) << " "
-					<< (T[8]*light0[0] + T[9]*light0[1] + T[10]*light0[2]
+					<< (T[8]*lights[0][0]
+							+ T[9]*lights[0][1]
+							+ T[10]*lights[0][2]
 							+ T[11] + win.pos().z()) << " "
 					<< std::endl;
 				std::cout << "\tcolor "
-					<< light0_diffuse[0] << " "
-					<< light0_diffuse[1] << " "
-					<< light0_diffuse[2] << std::endl;
+					<< lights_diffuse[0][0] << " "
+					<< lights_diffuse[0][1] << " "
+					<< lights_diffuse[0][2] << std::endl;
 				std::cout << "\tintensity 0.1" << std::endl;
 				std::cout << "end" << std::endl;
 				std::cout << std::endl;
 			}
 
-			if (light1_enabled)
+			if (lights_enabled[1])
 			{
 				std::cout << "# Static light:" << std::endl;
 				std::cout << "spherelight" << std::endl;
 				std::cout << "\torigin "
-					<< light1[0] << " "
-					<< light1[1] << " "
-					<< light1[2] << std::endl;
+					<< lights[1][0] << " "
+					<< lights[1][1] << " "
+					<< lights[1][2] << std::endl;
 				std::cout << "\tcolor "
-					<< light1_diffuse[0] << " "
-					<< light1_diffuse[1] << " "
-					<< light1_diffuse[2] << std::endl;
+					<< lights_diffuse[1][0] << " "
+					<< lights_diffuse[1][1] << " "
+					<< lights_diffuse[1][2] << std::endl;
 				std::cout << "\tintensity 1.0" << std::endl;
 				std::cout << "end" << std::endl;
 				std::cout << std::endl;
@@ -349,11 +365,11 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 
 		case '1':
-			light0_enabled = !light0_enabled;
+			lights_enabled[0] = !lights_enabled[0];
 			break;
 
 		case '2':
-			light1_enabled = !light1_enabled;
+			lights_enabled[1] = !lights_enabled[1];
 			break;
 
 		case 'm':
@@ -410,73 +426,73 @@ void keyboardSpecial(int key, int x, int y)
 
 		case GLUT_KEY_F1:
 			if (isShift)
-				user_params0[0] -= user_params0_step;
+				user_params[0][0] -= user_params_steps[0];
 			else
-				user_params0[0] += user_params0_step;
+				user_params[0][0] += user_params_steps[0];
 			break;
 
 		case GLUT_KEY_F2:
 			if (isShift)
-				user_params0[1] -= user_params0_step;
+				user_params[0][1] -= user_params_steps[0];
 			else
-				user_params0[1] += user_params0_step;
+				user_params[0][1] += user_params_steps[0];
 			break;
 
 		case GLUT_KEY_F3:
 			if (isShift)
-				user_params0[2] -= user_params0_step;
+				user_params[0][2] -= user_params_steps[0];
 			else
-				user_params0[2] += user_params0_step;
+				user_params[0][2] += user_params_steps[0];
 			break;
 
 		case GLUT_KEY_F4:
 			if (isShift)
-				user_params0[3] -= user_params0_step;
+				user_params[0][3] -= user_params_steps[0];
 			else
-				user_params0[3] += user_params0_step;
+				user_params[0][3] += user_params_steps[0];
 			break;
 
 		case GLUT_KEY_F5:
 			if (isShift)
-				user_params1[0] -= user_params1_step;
+				user_params[1][0] -= user_params_steps[1];
 			else
-				user_params1[0] += user_params1_step;
+				user_params[1][0] += user_params_steps[1];
 			break;
 
 		case GLUT_KEY_F6:
 			if (isShift)
-				user_params1[1] -= user_params1_step;
+				user_params[1][1] -= user_params_steps[1];
 			else
-				user_params1[1] += user_params1_step;
+				user_params[1][1] += user_params_steps[1];
 			break;
 
 		case GLUT_KEY_F7:
 			if (isShift)
-				user_params1[2] -= user_params1_step;
+				user_params[1][2] -= user_params_steps[1];
 			else
-				user_params1[2] += user_params1_step;
+				user_params[1][2] += user_params_steps[1];
 			break;
 
 		case GLUT_KEY_F8:
 			if (isShift)
-				user_params1[3] -= user_params1_step;
+				user_params[1][3] -= user_params_steps[1];
 			else
-				user_params1[3] += user_params1_step;
+				user_params[1][3] += user_params_steps[1];
 			break;
 
 		case GLUT_KEY_F9:
 			if (isShift)
-				user_params0_step /= 1.1;
+				user_params_steps[0] /= 1.1;
 			else
-				user_params0_step *= 1.1;
+				user_params_steps[0] *= 1.1;
 			changed = false;
 			break;
 
 		case GLUT_KEY_F10:
 			if (isShift)
-				user_params1_step /= 1.1;
+				user_params_steps[1] /= 1.1;
 			else
-				user_params1_step *= 1.1;
+				user_params_steps[1] *= 1.1;
 			changed = false;
 			break;
 	}
@@ -486,21 +502,21 @@ void keyboardSpecial(int key, int x, int y)
 		std::cout << "User parameters:" << std::endl;
 		std::cout << "----------------" << std::endl;
 		std::cout << "user_params0 = vec4("
-			<< user_params0[0] << ", "
-			<< user_params0[1] << ", "
-			<< user_params0[2] << ", "
-			<< user_params0[3] << ");"
+			<< user_params[0][0] << ", "
+			<< user_params[0][1] << ", "
+			<< user_params[0][2] << ", "
+			<< user_params[0][3] << ");"
 			<< std::endl;
 		std::cout << "user_params1 = vec4("
-			<< user_params1[0] << ", "
-			<< user_params1[1] << ", "
-			<< user_params1[2] << ", "
-			<< user_params1[3] << ");"
+			<< user_params[1][0] << ", "
+			<< user_params[1][1] << ", "
+			<< user_params[1][2] << ", "
+			<< user_params[1][3] << ");"
 			<< std::endl;
 		std::cout << "user_params0_step = "
-			<< user_params0_step << ";" << std::endl;
+			<< user_params_steps[0] << ";" << std::endl;
 		std::cout << "user_params1_step = "
-			<< user_params1_step << ";" << std::endl;
+			<< user_params_steps[1] << ";" << std::endl;
 		std::cout << std::endl;
 	}
 
