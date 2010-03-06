@@ -567,7 +567,7 @@ void mouse(int button, int state, int x, int y)
 
 int main(int argc, char **argv)
 {
-	win.setSize(512, 512);
+	win.setSize(640, 400);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
