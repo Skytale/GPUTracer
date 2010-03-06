@@ -1,7 +1,7 @@
 #!/bin/bash
 
-RAY=${1:-shader_ray_marching.glsl}
-OBJECT=${2:-shader_object_mandelbulb.glsl}
+RAY=${1:-ray/marching.glsl}
+OBJECT=${2:-objects/m_mandelbulb.glsl}
 
 cpp -P \
 	-DOBJECT_FUNCTIONS=\"$OBJECT\" \

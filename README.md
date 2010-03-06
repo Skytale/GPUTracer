@@ -20,7 +20,7 @@ These objects are already implemented:
 * Traditional raytracing with algebraic intersection testing: A simple
   sphere.
 * Ray marching with final bisection: Mandelbulb, Quaternion Julia
-  Fractals and a smooth cube.
+  Fractals and some algebraic surfaces.
 
 
 Building
@@ -58,19 +58,19 @@ statements. Hence you need CPP.
 `RAY_FUNCTIONS` must point to a file that defines this method:
 
 	bool findIntersection(in vec3 orig, in vec3 dir,
-		inout float dist, inout vec3 hitpoint, inout vec3 normal);
+		inout vec3 hitpoint, inout vec3 normal);
 
 This is called from `main()` to find out whether one particular ray has
 an intersection with the object or not. Basically, you can implement
-anything you like in that function. `shader_ray_direct.glsl` contains a
-simple wrapper function to `getIntersection()` (see below) while
-`shader_ray_marching.glsl` implements a ray marching algorithm.
+anything you like in that function. `ray/direct.glsl` contains a simple
+wrapper function to `getIntersection()` (see below) while
+`ray/marching.glsl` implements a ray marching algorithm.
 
 The function `getIntersection()` is supposed to be implemented by
 objects that can do algebraic intersection testing.
-`shader_object_sphere.glsl` is an example.
+`objects/d_sphere.glsl` is an example.
 
-`shader_ray_marching.glsl`, instead, implements ray marching. This, in
+`ray/marching.glsl`, instead, implements ray marching. This, in
 turn, expects a function called `evalAt()`. That function is supposed to
 evaluate your iso surface at a given point. Take the cube as an example:
 
