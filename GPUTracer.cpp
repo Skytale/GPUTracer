@@ -149,11 +149,12 @@ void display(void)
 
 	// Draw one quad so that we get one fragment covering the whole
 	// screen.
+	double r = win.ratio();
 	glBegin(GL_QUADS);
-	glVertex3f(-1, -1,  0);
-	glVertex3f( 1, -1,  0);
-	glVertex3f( 1,  1,  0);
-	glVertex3f(-1,  1,  0);
+	glVertex3f(-r, -1,  0);
+	glVertex3f( r, -1,  0);
+	glVertex3f( r,  1,  0);
+	glVertex3f(-r,  1,  0);
 	glEnd();
 
 	// Draw coordinate system.
@@ -163,9 +164,16 @@ void display(void)
 	glPushMatrix();
 
 	glLineWidth(3.0);
-	glTranslated(0.75, -0.75, 0);
+
+	// In y direction, move to -0.75.
+	// In x direction, move to  0.75. From that point on, add the
+	// difference of width and height in world coordinates. This will
+	// keep the (drawn) coordinate system at a position with a fixed
+	// margin to the window borders.
+	glTranslated(0.75 + (win.w() - win.h()) / (double)win.h(), -0.75, 0);
 	glScaled(0.2, 0.2, 0.2);
 	glMultMatrixf(oriMatrix);
+
 	glBegin(GL_LINES);
 
 	glColor3f(1.0, 0.0, 0.0);
@@ -181,6 +189,7 @@ void display(void)
 	glVertex3f(0, 0, 1);
 
 	glEnd();
+
 	glPopMatrix();
 	glDisable(GL_DEPTH_TEST);
 
@@ -192,9 +201,11 @@ void reshape(int w, int h)
 	glClearColor(0, 0, 0, 1);
 	glViewport(0, 0, w, h);
 
+	win.setSize(w, h);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-1, 1, -1, 1, -1, 1);
+	glOrtho(-win.ratio(), win.ratio(), -1, 1, -1, 1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

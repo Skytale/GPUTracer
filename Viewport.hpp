@@ -46,6 +46,7 @@ class Viewport
 		int w() { return _w; }
 		int h() { return _h; }
 		double fov() { return _fov; }
+		double ratio() { return (double)_w / (double)_h; }
 
 #ifdef MATRIX_ROTATION
 		Mat4& ori() { return _ori; }
