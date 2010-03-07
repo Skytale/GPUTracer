@@ -36,7 +36,7 @@ vec3 light1_diffuse = gl_LightSource[1].diffuse.xyz;
 vec3 light1_specular = gl_LightSource[1].specular.xyz;
 
 vec3 object_diffuse = vec3(1.0, 0.7, 0.3);
-float object_shininess = 10;
+float object_shininess = 10.0;
 
 // This will be processed by CPP. You have to call something like this:
 //

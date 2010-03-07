@@ -21,7 +21,7 @@
 // Parameters for ray marching
 uniform float stepsize;
 uniform float accuracy;
-float maxval = 10;
+float maxval = 10.0;
 float normalEps = 1e-5;
 
 bool findIntersection(in vec3 orig, in vec3 dir, inout vec3 hitpoint,

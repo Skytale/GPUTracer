@@ -38,7 +38,7 @@ bool getIntersection(in vec3 orig, in vec3 dir, inout vec3 hitpoint,
 	float a = sqrt(sphere_radius2 - distToCenter2);
 	if (alpha >= a)
 		alpha -= a;
-	else if (alpha + a > 0)
+	else if (alpha + a > 0.0)
 		alpha += a;
 	else
 		return false;

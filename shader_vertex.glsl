@@ -31,5 +31,5 @@ void main(void)
 	// this is a vertex shader and "p" is a varying variable. That
 	// means, this position will get interpolated over the quad. So we
 	// get a point on the viewing plane -- for each pixel.
-	p = gl_Vertex;
+	p = gl_Vertex.xyz;
 }

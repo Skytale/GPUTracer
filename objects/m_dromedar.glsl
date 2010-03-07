@@ -23,7 +23,7 @@ float evalAt(vec3 at)
 	// The so-called "dromedar". To be used with ray marching.
 	// See http://www.freigeist.cc/gallery.html .
 	return at.x * at.x * at.x * at.x
-		- 3 * at.x * at.x
+		- 3.0 * at.x * at.x
 		+ at.y * at.y
 		+ at.z * at.z * at.z;
 }

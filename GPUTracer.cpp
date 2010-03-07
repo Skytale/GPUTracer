@@ -86,6 +86,28 @@ static float user_params_steps[] = { 0.1, 1.0 };
 // 0 = change user settings with F1-F10, 1 = change light settings.
 static int settings_target = 0;
 
+void showLog(GLuint shader, const char *which)
+{
+	std::cout << which << std::endl;
+	int len = 0;
+	glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+			&len);
+	// More than the NULL terminator?
+	if (len > 1)
+	{
+		char *log = (char *)malloc(len * sizeof(char));
+		int dummy = 0;
+		glGetInfoLogARB(shader, len, &dummy, log);
+		std::cout << log << std::endl;
+		free(log);
+	}
+	else
+	{
+		std::cout << "Okay, error log empty." << std::endl;
+	}
+	std::cout << std::endl;
+}
+
 void loadShaders(void)
 {
 	const char *vs_source = readFile("shader_vertex.glsl");
@@ -104,11 +126,13 @@ void loadShaders(void)
 	shader_handle = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(shader_handle, 1, &vs_source, NULL);
 	glCompileShader(shader_handle);
+	showLog(shader_handle, "Vertex shader:");
 	glAttachShader(shader, shader_handle);
 
 	shader_handle = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(shader_handle, 1, &fs_source, NULL);
 	glCompileShader(shader_handle);
+	showLog(shader_handle, "Fragment shader:");
 	glAttachShader(shader, shader_handle);
 
 	glLinkProgram(shader);

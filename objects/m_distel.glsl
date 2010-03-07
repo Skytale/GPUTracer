@@ -23,7 +23,7 @@ float evalAt(vec3 at)
 	// The so-called "distel". To be used with ray marching.
 	// See http://www.freigeist.cc/gallery.html .
 	return
-		dot(at, at) + 1000 *
+		dot(at, at) + 1000.0 *
 		dot(at.xy, at.xy) *
 		dot(at.xz, at.xz) *
 		dot(at.yz, at.yz) - 1.0;

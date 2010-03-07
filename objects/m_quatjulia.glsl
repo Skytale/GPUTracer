@@ -45,7 +45,7 @@ float evalAt(vec3 at)
 	// Read julia settings from first user parameters.
 	vec4 c = user_params0;
 
-	float n = 0;
+	float n = 0.0;
 	float sqr_abs_z = 0.0;
 
 	// Read nMax from first item of second user parameters.

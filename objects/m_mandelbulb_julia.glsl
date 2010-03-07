@@ -31,7 +31,7 @@ float evalAt(vec3 at)
 	float r = 0.0;
 
 	// Read nMax from first item of second user settings.
-	for (float count = 0; count < user_params1.s - 1.0; count += 1)
+	for (float count = 0.0; count < user_params1.s - 1.0; count += 1.0)
 	{
 		vec3 z2 = z * z;
 		r = sqrt(dot(z, z));
