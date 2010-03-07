@@ -678,6 +678,37 @@ void mouse(int button, int state, int x, int y)
 	}
 }
 
+void loadDefaultUserSettings(void)
+{
+	std::cout
+		<< "Trying to load user settings from `user.conf'... "
+		<< "errors ignored."
+		<< std::endl;
+	char *data = readFile("user.conf");
+	if (data == NULL)
+	{
+		std::cout << "Okay, nevermind." << std::endl << std::endl;
+		return;
+	}
+
+	sscanf(data, "%f %f %f %f\n%f %f %f %f\n%f %f",
+			&user_params[0][0],
+			&user_params[0][1],
+			&user_params[0][2],
+			&user_params[0][3],
+
+			&user_params[1][0],
+			&user_params[1][1],
+			&user_params[1][2],
+			&user_params[1][3],
+
+			&user_params_steps[0],
+			&user_params_steps[1]);
+
+	std::cout << "User settings read." << std::endl << std::endl;
+	free(data);
+}
+
 int main(int argc, char **argv)
 {
 	win.setSize(640, 400);
@@ -696,6 +727,7 @@ int main(int argc, char **argv)
 	glutPassiveMotionFunc(motion);
 
 	loadShaders();
+	loadDefaultUserSettings();
 
 	// We don't start at (0, 0, 0). Most objects are centered at that
 	// position so we push the cam a little bit. This also sets the

@@ -139,3 +139,27 @@ Keys specific to ray marching:
 * `[g]` switches to a low accuracy when doing bisection.
 * `[G]` switches to a higher accuracy when doing bisection.
 * `[h]` toggles both step size and accuracy at once.
+
+
+Configuration
+-------------
+
+Optionally, you can create a file called `user.conf` in the program
+directory. This file is supposed to contain some numbers, each being a
+float value:
+
+	a b c d
+	e f g h
+	i j
+
+`a` to `d` are the default values for the first `vec4` of user settings
+and `e` to `h` are those for the second `vec4`. `i` is the default step
+size for the first vector and `j` the one for the second vector.
+
+So your file could look like this:
+
+	0.2 0.0 1.0 0.5
+	0.0 0.5 0.0 0.5
+	0.1 0.1
+
+It doesn't matter if that file does not exist.
