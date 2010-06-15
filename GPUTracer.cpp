@@ -21,11 +21,11 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glut.h>
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
+#include <fstream>
 
-#include "Utils.hpp"
 #include "Viewport.hpp"
 
 Viewport win;
@@ -86,6 +86,34 @@ static float user_params_steps[] = { 0.1, 1.0 };
 // 0 = change user settings with F1-F10, 1 = change light settings.
 static int settings_target = 0;
 
+char *readFile(const char *path)
+{
+	char *databuf = NULL;
+	int length = 0;
+
+	std::ifstream instream;
+	instream.open(path, std::ios::binary);
+	if (!instream.is_open())
+		return NULL;
+
+	// Get length of file.
+	instream.seekg(0, std::ios::end);
+	length = instream.tellg();
+	instream.seekg(0, std::ios::beg);
+
+	// Allocate memory.
+	databuf = new char[length + 1];
+
+	// Read data as a block.
+	instream.read(databuf, length);
+	instream.close();
+
+	// Add NULL terminator.
+	databuf[length] = 0;
+
+	return databuf;
+}
+
 void showLog(GLuint shader, const char *which)
 {
 	std::cout << which << std::endl;
@@ -95,11 +123,11 @@ void showLog(GLuint shader, const char *which)
 	// More than the NULL terminator?
 	if (len > 1)
 	{
-		char *log = (char *)malloc(len * sizeof(char));
+		char *log = new char[len];
 		int dummy = 0;
 		glGetInfoLogARB(shader, len, &dummy, log);
 		std::cout << log << std::endl;
-		free(log);
+		delete[] log;
 	}
 	else
 	{
@@ -706,7 +734,7 @@ void loadDefaultUserSettings(void)
 			&user_params_steps[1]);
 
 	std::cout << "User settings read." << std::endl << std::endl;
-	free(data);
+	delete[] data;
 }
 
 int main(int argc, char **argv)
