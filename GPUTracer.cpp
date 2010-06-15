@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "Viewport.hpp"
 
@@ -294,7 +295,7 @@ void reshape(int w, int h)
 	glLoadIdentity();
 }
 
-void tellUserParams()
+void tellUserParams(void)
 {
 	std::cout << "User parameters:" << std::endl;
 	std::cout << "----------------" << std::endl;
@@ -719,21 +720,24 @@ void loadDefaultUserSettings(void)
 		return;
 	}
 
-	sscanf(data, "%f %f %f %f\n%f %f %f %f\n%f %f",
-			&user_params[0][0],
-			&user_params[0][1],
-			&user_params[0][2],
-			&user_params[0][3],
+	std::stringstream ssdata(data);
 
-			&user_params[1][0],
-			&user_params[1][1],
-			&user_params[1][2],
-			&user_params[1][3],
+	ssdata >> user_params[0][0];
+	ssdata >> user_params[0][1];
+	ssdata >> user_params[0][2];
+	ssdata >> user_params[0][3];
 
-			&user_params_steps[0],
-			&user_params_steps[1]);
+	ssdata >> user_params[1][0];
+	ssdata >> user_params[1][1];
+	ssdata >> user_params[1][2];
+	ssdata >> user_params[1][3];
+
+	ssdata >> user_params_steps[0];
+	ssdata >> user_params_steps[1];
 
 	std::cout << "User settings read." << std::endl << std::endl;
+	tellUserParams();
+
 	delete[] data;
 }
 
