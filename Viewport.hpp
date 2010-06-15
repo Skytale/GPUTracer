@@ -23,7 +23,6 @@
 
 #include "VecMath.hpp"
 
-
 class Viewport
 {
 	private:
@@ -42,182 +41,31 @@ class Viewport
 #endif
 
 	public:
-		Vec3& pos() { return _pos; }
-		int w() { return _w; }
-		int h() { return _h; }
-		double fov() { return _fov; }
-		double ratio() { return (double)_w / (double)_h; }
+		Vec3& pos();
+		int w();
+		int h();
+		double fov();
+		double ratio();
 
 #ifdef MATRIX_ROTATION
-		Mat4& ori() { return _ori; }
+		Mat4& ori();
 #else
-		Quat4& ori() { return _ori; }
+		Quat4& ori();
 #endif
 
-		void rotateAroundAxis(int whichAxis, double degree)
-		{
-			// Convert to radiant
-			double radiant = degree * (M_PI / 180);
+		void rotateAroundAxis(int whichAxis, double degree);
+		void moveAlongAxis(int whichAxis, int dir, bool faster);
+		Mat4 orientationMatrix();
 
-#ifdef MATRIX_ROTATION
-			// What is ori()?
-			//
-			// It's the matrix that transforms vectors of the GLOBAL
-			// system into vectors of the LOCAL system. Hence, it
-			// can be multiplied with OpenGL's transformation matrix
-			// in display() so that we can write down global vectors.
-			//
-			// What we want to do right here, is "rotating the local
-			// system relative to the global system". In fact, we want
-			// to set
-			//     ori()' = ori() * ROTATION .
-			// That is, vectors that will be drawn later on (given in
-			// global coordinates) shall be rotated before they're
-			// converted into our local system. This rotation must
-			// take place in GLOBAL coordinates (because our vectors
-			// are global). So what we must do first, is getting the
-			// matrix T that transforms LOCAL coordinates into GLOBAL
-			// coordinates so we can do
-			//           1
-			//     T * ( 0 ) = ...
-			//           0
-			// to get the current x-axis of that system in global
-			// coordinates (for example). Since ori() is orthonormal
-			// we can simply transpose it.
-			//
-			// I don't really transpose it, I just pick its ROW entries:
-			Vec3 axis = ori().row(whichAxis);
-
-			// Now create a proper rotation matrix and apply it
-			// on our current orientation.
-			Mat4 rotMat = Mat4(axis, radiant);
-
-			// By multiplying our current matrix with this particular
-			// rotation matrix, we "store" that rotation. So we've
-			// successfully modified our local coordinate system.
-			ori() *= rotMat;
-#else
-			// Find the rotation-axis for this operation
-			Mat4 currentAxes = ori().makeRotate();
-			Vec3 axis = currentAxes.row(whichAxis);
-			axis.normalize();
-
-			// Build the Quat4 according to:
-			// http://en.wikipedia.org/wiki/Quaternion_rotation
-			Quat4 mult(axis, radiant);
-
-			// Now multiply our existing quaternion with the new one.
-			ori() *= mult;
-			ori().normalize();
-#endif
-		}
-
-		void moveAlongAxis(int whichAxis, int dir, bool faster)
-		{
-#ifdef MATRIX_ROTATION
-			Vec3 axis = ori().row(whichAxis);
-#else
-			Mat4 currentAxes = ori().makeRotate();
-			Vec3 axis = currentAxes.row(whichAxis);
-#endif
-
-			axis.normalize();
-			axis *= dir;
-			axis *= (faster ? _movingStep * 10 : _movingStep);
-			pos() += axis;
-		}
-
-		Mat4 orientationMatrix()
-		{
-#ifdef MATRIX_ROTATION
-			return ori();
-#else
-			return ori().makeRotate();
-#endif
-		}
-
-		void setInitialConfig(Vec3 p, double step, double initialfov)
-		{
-			_initPos = p;
-			_initMovingStep = step;
-			_fov = initialfov;
-		}
-
-		void setSize(int w, int h)
-		{
-			_w = w;
-			_h = h;
-		}
-
-		void increaseSpeed()
-		{
-			_movingStep *= 1.2;
-			std::cout << "Moving speed: " << _movingStep << std::endl;
-		}
-
-		void decreaseSpeed()
-		{
-			_movingStep /= 1.2;
-			std::cout << "Moving speed: " << _movingStep << std::endl;
-		}
-
-		void resetSpeed()
-		{
-			_movingStep = _initMovingStep;
-			std::cout << "Resetting moving speed." << std::endl;
-		}
-
-		void reset()
-		{
-			ori().makeIdentity();
-			pos() = _initPos;
-			_movingStep = _initMovingStep;
-			std::cout << "Resetting everything." << std::endl;
-		}
-
-		void setFOV(double f)
-		{
-			_fov = f;
-		}
-
-		float eyedist()
-		{
-			// Convert to radiant
-			double radiant = fov() * (M_PI / 180);
-
-			radiant *= 0.5;
-			return 1.0 / tan(radiant);
-		}
-
-		void dumpInfos()
-		{
-			Mat4 T = orientationMatrix();
-
-			std::cout << "camera" << std::endl;
-			std::cout << "\tfov " << fov() << std::endl;
-			std::cout << "\torigin "
-				<< pos().x() << " "
-				<< pos().y() << " "
-				<< pos().z() << " " << std::endl;
-
-			// Actually, this is: T * (0, 0, -1).
-			// Same reason as above, we want to get the negative z-axis
-			// in local coordinates.
-			std::cout << "\tviewdir "
-				<< -T[2] << " "
-				<< -T[6] << " "
-				<< -T[10] << std::endl;
-
-			// That's T * (0, 1, 0).
-			std::cout << "\tupdir "
-				<< T[1] << " "
-				<< T[5] << " "
-				<< T[9] << std::endl;
-
-			std::cout << "end" << std::endl;
-			std::cout << std::endl;
-		}
+		void setInitialConfig(Vec3 p, double step, double initialfov);
+		void setSize(int w, int h);
+		void increaseSpeed();
+		void decreaseSpeed();
+		void resetSpeed();
+		void reset();
+		void setFOV(double f);
+		float eyedist();
+		void dumpInfos();
 };
-
 
 #endif // VIEWPORT_HPP
