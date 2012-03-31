@@ -11,4 +11,4 @@ env.Append(LIBPATH = ['.'])
 # What to build:
 env.StaticLibrary('VecMath', ['VecMath.cpp'])
 env.Program('tracer', ['GPUTracer.cpp', 'Viewport.cpp'],
-	LIBS = ['glut', 'VecMath'])
+	LIBS = ['glut', 'VecMath', 'GL'])
